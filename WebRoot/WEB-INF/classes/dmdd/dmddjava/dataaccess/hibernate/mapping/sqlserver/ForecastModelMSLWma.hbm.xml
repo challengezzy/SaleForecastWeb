@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<joined-subclass 
+    name="dmdd.dmddjava.dataaccess.dataobject.ForecastModelMSLWma" 
+    table="FORECASTMODELMSLWMA"
+    extends="dmdd.dmddjava.dataaccess.dataobject.ForecastModelM"
+>
+
+<key column="ID"/>
+
+    <property
+        name="dataPeriodNum"
+        type="int"
+        column="DATAPERIODNUM"
+        not-null="true"
+        length="4"
+    />
+    <property
+        name="seasonSmoothingFactor"
+        type="java.lang.Double"
+        column="SEASONSMOOTHINGFACTOR"
+        not-null="true"
+        length="18"
+    />
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to ForecastModelMSLWmaItem -->
+    <set
+        name="forecastModelMSLWmaItems"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="FORECASTMODELMSLWMAID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.ForecastModelMSLWmaItem"
+        />
+    </set>
+
+</joined-subclass>
+</hibernate-mapping>

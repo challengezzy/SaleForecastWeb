@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.ForecastRunTaskItem" 
+    table="FORECASTRUNTASKITEM"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="sequence">
+            <param name="sequence">S_FORECASTRUNTASKITEM</param>
+        </generator>
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="seqNo"
+        type="int"
+        column="SEQNO"
+        not-null="true"
+        length="4"
+    />
+    <property
+        name="isIgnoreErrorThreshold"
+        type="int"
+        column="ISIGNOREERRORTHRESHOLD"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="status"
+        type="int"
+        column="STATUS"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="result"
+        type="int"
+        column="RESULT"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="resultDetail"
+        type="java.lang.String"
+        column="RESULTDETAIL"
+        length="255"
+    />
+    <property
+        name="beginTime"
+        type="java.sql.Timestamp"
+        column="BEGINTIME"
+        length="7"
+    />
+    <property
+        name="endTime"
+        type="java.sql.Timestamp"
+        column="ENDTIME"
+        length="7"
+    />
+    <property
+        name="et"
+        type="java.lang.Double"
+        column="ET"
+        length="18"
+    />
+    <property
+        name="mape"
+        type="java.lang.Double"
+        column="MAPE"
+        length="18"
+    />
+    <property
+        name="mad"
+        type="java.lang.Double"
+        column="MAD"
+        length="18"
+    />
+    <property
+        name="ts"
+        type="java.lang.Double"
+        column="TS"
+        length="18"
+    />
+    <property
+        name="mse"
+        type="java.lang.Double"
+        column="MSE"
+        length="18"
+    />
+    <property
+        name="forecastInstCode"
+        type="java.lang.String"
+        column="FORECASTINSTCODE"
+        not-null="true"
+        length="255"
+    />
+    <property
+        name="forecastInstName"
+        type="java.lang.String"
+        column="FORECASTINSTNAME"
+        not-null="true"
+        length="255"
+    />
+    <property
+        name="forecastModelCode"
+        type="java.lang.String"
+        column="FORECASTMODELCODE"
+        length="255"
+    />
+    <property
+        name="forecastModelName"
+        type="java.lang.String"
+        column="FORECASTMODELNAME"
+        length="255"
+    />
+    <property
+        name="outlierAnalyzePeriodNum"
+        type="int"
+        column="OUTLIERANALYZEPERIODNUM"
+        not-null="true"
+        length="4"
+    />
+    <property
+        name="errorThreshold"
+        type="java.lang.Double"
+        column="ERRORTHRESHOLD"
+        not-null="true"
+        length="18"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+
+    <!-- Associations -->
+  
+    <!-- uni-directional many-to-one association to ProductLayer -->
+    <many-to-one
+        name="runProductLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.ProductLayer"
+    >
+        <column name="RUNPRODUCTLAYERID" />
+    </many-to-one>
+    <!-- bi-directional many-to-one association to ForecastRunTask -->
+    <many-to-one
+        name="forecastRunTask"
+        class="dmdd.dmddjava.dataaccess.dataobject.ForecastRunTask"
+        not-null="true"
+    >
+        <column name="FORECASTRUNTASKID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to OrganizationLayer -->
+    <many-to-one
+        name="runOrganizationLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.OrganizationLayer"
+    >
+        <column name="RUNORGANIZATIONLAYERID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to ForecastInst -->
+    <many-to-one
+        name="forecastInst"
+        class="dmdd.dmddjava.dataaccess.dataobject.ForecastInst"
+    >
+        <column name="FORECASTINSTID" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

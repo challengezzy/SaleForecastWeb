@@ -1,0 +1,236 @@
+package dmdd.dmddjava.dm.inventory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.cool.common.constant.DMOConst;
+import com.cool.common.util.HashVoUtil;
+import com.cool.common.vo.HashVO;
+
+import dmdd.dmddjava.common.constant.BizConst;
+import dmdd.dmddjava.common.enums.OrderType;
+import dmdd.dmddjava.dataaccess.bizobject.BOrganization;
+import dmdd.dmddjava.dataaccess.bizobject.BProduct;
+import dmdd.dmddjava.dataaccess.dataobject.InPoprData;
+import dmdd.dmddjava.dm.BasicDM;
+import dmdd.dmddjava.dm.MainDataQueryDm;
+import dmdd.dmddjava.service.validator.DateValidator;
+
+/**
+ * ClassName:InPoprDataDM 
+ * 
+ * @author leslie
+ * @version
+ * @since Ver 1.1
+ * @Date 2017年6月6日 下午11:20:56
+ * 
+ * @see
+ */
+public class InPoprDataDM extends BasicDM {
+	
+	private MainDataQueryDm mainDataQueryDm = new MainDataQueryDm();
+	
+	/**从界面导入采购订单数据*/
+    public List<Map<String,String>> importData4UI(List<Map<String,String>> dataList) throws Exception {
+    	int okNum = 0; //处理成功的数据
+    	int failNum = 0; //处理失败的数据
+    	
+    	//一条一条处理，处理失败的数据不影响成功数据的入库
+    	StringBuilder sqlSb = new StringBuilder("if not exists (");
+    	sqlSb.append(" SELECT 1 FROM IN_POPR_DATA T WHERE PERIOD=? and ordertype=? AND ORGANIZATIONID=? AND PRODUCTID=? AND BATCH_NO=? ");
+    	sqlSb.append(" ) insert into IN_POPR_DATA(version, period, ordertype, organizationid, productid, batch_no, receiving_date, quantity, status, comments) ");
+    	sqlSb.append("  values (0, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    	sqlSb.append(" else ");
+    	sqlSb.append(" update IN_POPR_DATA set version=version+1,receiving_date=?, quantity=?, comments=? ");
+    	sqlSb.append(" WHERE PERIOD=? and ordertype=? AND ORGANIZATIONID=? AND PRODUCTID=? AND BATCH_NO=? ");
+    	sqlSb.append("");
+    	
+//    	String sql = "insert into IN_POPR_DATA(version, period, ordertype, organizationid, productid, batch_no, receiving_date, quantity, status, comments) values "
+//            + "(0, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    	//String rowResult = "OK";
+    	for(Map<String,String> data : dataList){
+    		try{
+    			String proCode = data.get("proCode");
+    			String orgCode = data.get("orgCode");
+    			String orderType = data.get("orderType");
+    			String batchNo = data.get("batchNo");
+    			String period = data.get("period");
+    			String receivingDate = data.get("receivingDate");
+    			String comments = data.get("comments");
+    			//为空判断
+    			if(StringUtils.isEmpty(proCode) || StringUtils.isEmpty(orgCode) 
+    				|| StringUtils.isEmpty(orderType)	|| StringUtils.isEmpty(batchNo) 
+    				|| StringUtils.isEmpty(data.get("quantity")) || StringUtils.isEmpty(period) ){
+    				throw new Exception("key data is not allowed null.(period,procode,orgcode,orderType,batchNo,quantity)");
+    			}
+    			//判断产品和组织是否存在
+    			BProduct product = mainDataQueryDm.getDetailProductByCode(proCode);
+    			if(product == null){
+    				throw new Exception("Cannot find detail product by code ");
+    			}
+    			
+    			//日期检查
+    			if( receivingDate.length() !=8 || !DateValidator.isValidateYYYYMMDD(receivingDate)){
+    				throw new Exception("Invalid receiving date, Should by valid YYYYMMDD ");
+    			}
+    			
+    			//到货日期必须大于等于当前日期
+    			if(receivingDate.compareTo(period) < 0 ){
+    				throw new Exception("Invalid receiving date, must bigger than current period ");
+    			}
+    			
+    			BOrganization org = mainDataQueryDm.getDetailOranizationByCode(orgCode);
+    			if(org == null ){
+    				throw new Exception("Cannot find detail organization by code ");
+    			}
+    			/**增加PA校验
+    			 *modify by zxc
+    			 **/
+    			if(!OrderType.isOrderType(orderType)){    				
+    				throw new Exception("Invalide Order Type, must be PO or PR ");
+    			}
+    			//数量必须为正数	
+    			double quantity = new Double(data.get("quantity") );
+    			if(quantity < 0 ){
+    				throw new Exception("quantity must be a positive number ");
+    			}
+    			
+    			try{
+	    			dmo.executeUpdateByDS(DMOConst.DS_DEFAULT, sqlSb.toString(), period, orderType, org.getId(),product.getId(),batchNo
+	    					,period, orderType, org.getId(),product.getId(),batchNo,receivingDate,quantity,BizConst.GLOBAL_YESNO_YES, comments
+	    					,receivingDate,quantity, comments,period, orderType, org.getId(),product.getId(),batchNo);
+	    			dmo.commit(DMOConst.DS_DEFAULT);
+    			}catch (Exception e) {//数据库异常
+					dmo.rollback(DMOConst.DS_DEFAULT);
+					throw e;
+				}
+    			okNum ++;
+    			data.put("importResult", "OK");
+    		}catch (Exception e) {
+    			failNum ++;
+    			data.put("importResult", e.toString());
+				logger.warn("POPR导入中，单条数据处理异常["+data+"]");
+				e.printStackTrace();
+			}
+    	}
+    	
+    	logger.info("导入PO/PR数据，本次处理["+dataList.size()+"]条，成功["+okNum+"]条，失败["+failNum+"]条");
+    	
+    	return dataList;
+    }
+	
+	//查询导入的采购订单数据
+    public List<Map<String,Object>> queryByCondition(Map<String,String> cond) throws Exception {
+        String sql = "SELECT D.ID,D.PERIOD,D.ORDERTYPE,D.PRODUCTID,D.ORGANIZATIONID,D.BATCH_NO,D.RECEIVING_DATE,D.QUANTITY,D.STATUS,D.COMMENTS"
+        	+" ,O.CODE ORGCODE,O.NAME ORGNAME,P.CODE PROCODE,P.NAME PRONAME"
+        	+" FROM IN_POPR_DATA D,PRODUCT P,ORGANIZATION O"
+        	+" WHERE O.ID = D.ORGANIZATIONID AND P.ID=D.PRODUCTID ";
+        
+        sql += " and period = " + cond.get("period");
+        if(StringUtils.isNotEmpty(cond.get("orderType"))){
+        	sql += " and ordertype = '" + cond.get("orderType") + "'";
+        }
+        
+        if( "true".equalsIgnoreCase(cond.get("blurMatch")) ){
+        	//模糊查询
+        	if(StringUtils.isNotEmpty(cond.get("batchNo"))){
+            	sql += " and batch_no like '%" + cond.get("batchNo") + "%'";
+            }
+        	if(StringUtils.isNotEmpty(cond.get("receivingDate"))){
+            	sql += " and receiving_date like '" + cond.get("receivingDate") + "%'";
+            }
+        	if(StringUtils.isNotEmpty(cond.get("proCode"))){
+            	sql += " and p.code like '" + cond.get("proCode") + "%'";
+            }
+        	if(StringUtils.isNotEmpty(cond.get("orgCode"))){
+            	sql += " and o.code like '" + cond.get("orgCode") + "%'";
+            }
+        }else{
+        	if(StringUtils.isNotEmpty(cond.get("batchNo"))){
+            	sql += " and batch_no = '" + cond.get("batchNo") + "'";
+            }
+        	if(StringUtils.isNotEmpty(cond.get("receivingDate"))){
+            	sql += " and receiving_date = '" + cond.get("receivingDate") + "'";
+            }
+        	if(StringUtils.isNotEmpty(cond.get("proCode"))){
+            	sql += " and p.code = '" + cond.get("proCode") + "'";
+            }
+        	if(StringUtils.isNotEmpty(cond.get("orgCode"))){
+            	sql += " and o.code = '" + cond.get("orgCode") + "'";
+            }
+        }
+        
+        HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql);
+        List<Map<String,Object>> vosList = HashVoUtil.hashVosToMapList(vos);
+        
+        return vosList;
+    }
+
+    public int batchInsert(List<InPoprData> datas) throws Exception {
+        String sql = "insert into IN_POPR_DATA(version, period, ordertype, organizationid, productid, batch_no, receiving_date, quantity, status, comments) values "
+                + "('0', %d, '%s', %d, %d, '%s', '%s', %d, '%s', '%s')";
+        List<String> sqls = new ArrayList<String>(datas.size());
+        for (InPoprData data : datas) {
+            sqls.add(String.format(sql, data.getPeriod(), data.getOrderType(), data.getOrganizationId(), data.getProductId(), data.getBatchNo(),
+                    data.getReceivingDate(), data.getQuantity(), data.getStatus(), data.getComments()));
+        }
+        
+        int[] results = dmo.executeBatchByDS(DMOConst.DS_DEFAULT, sqls);
+        int result = 0;
+        for (int i : results) {
+            result += i;
+        }
+        return result;
+    }
+    
+    @Deprecated
+    public List<InPoprData> queryByCondition(InPoprData condition) throws Exception {
+        String sql = "select * from in_popr_data where 1=1";
+        if (condition.getPeriod() != 0) {
+            sql += " period = " + condition.getPeriod();
+        }
+        if (StringUtils.isNotEmpty(condition.getOrderType())) {
+            sql += " ordertype = '" + condition.getOrderType() + "'";
+        }
+        if (condition.getOrganizationId() != 0) {
+            sql += " organizationid = " + condition.getOrganizationId();
+        }
+        if (condition.getProductId() != 0) {
+            sql += " productid = " + condition.getProductId();
+        }
+        if (StringUtils.isNotEmpty(condition.getBatchNo())) {
+            sql += " batch_no = '" + condition.getBatchNo() + "'";
+        }
+        if (StringUtils.isNotEmpty(condition.getReceivingDate())) {
+            sql += " receiving_date = '" + condition.getReceivingDate() + "'";
+        }
+        if (condition.getStatus() != -1) {
+            sql += " status = " + condition.getStatus();
+        }
+        HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql);
+        
+        List<InPoprData> datas = new ArrayList<InPoprData>(vos.length);
+        for (int i = 0; i < vos.length; i ++) {
+            InPoprData data = new InPoprData();
+            data.setPeriod(vos[i].getIntegerValue("period"));
+            data.setOrderType(vos[i].getStringValue("ordertype"));
+            data.setOrganizationId(vos[i].getLognValue("organizationid"));
+            data.setProductId(vos[i].getLongValue("productid"));
+            data.setBatchNo(vos[i].getStringValue("batch_no"));
+            data.setReceivingDate(vos[i].getStringValue("receiving_date"));
+            data.setStatus(vos[i].getIntegerValue("status"));
+            data.setComments(vos[i].getStringValue("comments"));
+            data.setCreateTime(vos[i].getDateValue("createtime"));
+            data.setUpdateTime(vos[i].getDateValue("updatetime"));
+            
+            datas.add(data);
+        }
+        return datas;
+    }
+    
+    
+
+}

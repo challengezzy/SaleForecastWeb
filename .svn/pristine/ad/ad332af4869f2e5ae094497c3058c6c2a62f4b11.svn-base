@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.ProductCharacter" 
+    table="PRODUCTCHARACTER"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="sequence">
+            <param name="sequence">S_PRODUCTCHARACTER</param>
+        </generator>
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="code"
+        type="java.lang.String"
+        column="CODE"
+        not-null="true"
+        unique="true"
+        length="255"
+    />
+    <property
+        name="name"
+        type="java.lang.String"
+        column="NAME"
+        not-null="true"
+        unique="true"
+        length="255"
+    />
+    <property
+        name="type"
+        type="java.lang.String"
+        column="TYPE"
+        length="30"
+    />
+    <property
+        name="isCatalog"
+        type="int"
+        column="ISCATALOG"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="description"
+        type="java.lang.String"
+        column="DESCRIPTION"
+        length="255"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+ <property
+        name="pathCode"
+        type="java.lang.String"
+        column="PATHCODE"
+        length="512"
+    />
+    <!-- Associations -->
+  
+    <!-- uni-directional many-to-one association to ProductCharacterLayer -->
+    <many-to-one
+        name="productCharacterLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.ProductCharacterLayer"
+    >
+        <column name="PRODUCTCHARACTERLAYERID" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to ProductCharacter -->
+    <set
+        name="subProductCharacters"
+        lazy="true" batch-size="50"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="PARENTPRODUCTCHARACTERID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.ProductCharacter"
+        />
+    </set>
+    <!-- bi-directional many-to-one association to ProductCharacter -->
+    <many-to-one
+        name="parentProductCharacter"
+        class="dmdd.dmddjava.dataaccess.dataobject.ProductCharacter"
+        not-null="true"
+    >
+        <column name="PARENTPRODUCTCHARACTERID" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to ProductProCharacter -->
+    <set
+        name="productProCharacters"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="PRODUCTCHARACTERID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.ProductProCharacter"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

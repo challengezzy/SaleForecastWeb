@@ -1,0 +1,13 @@
+--人工预测，编辑分解规则
+alter table forecastinst add decomposeformula numeric(2,0) default 1;
+
+CREATE INDEX IDX_FORECASTVIEW_INSTID ON FORECASTINST_VIEW (
+FORECASTINSTID ASC
+)
+go
+
+
+CREATE INDEX FORECASTINST_UIDX_ISVALID ON FORECASTINST (
+ISVALID ASC
+)
+go

@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.UiPopbScope" 
+    table="UIPOPBSCOPE"
+>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="sequence">
+            <param name="sequence">S_UIPOPBSCOPE</param>
+        </generator>
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="uiCode"
+        type="java.lang.String"
+        column="UICODE"
+        not-null="true"
+        length="255"
+    />
+    <property
+        name="code"
+        type="java.lang.String"
+        column="CODE"
+        not-null="true"
+        length="255"
+    />
+    <property
+        name="name"
+        type="java.lang.String"
+        column="NAME"
+        length="255"
+    />
+    <property
+        name="isDefault"
+        type="int"
+        column="ISDEFAULT"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="isPeriodControl"
+        type="int"
+        column="ISPERIODCONTROL"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="periodOffsetBegin"
+        type="int"
+        column="PERIODOFFSETBEGIN"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="periodOffsetEnd"
+        type="int"
+        column="PERIODOFFSETEND"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="isDisplayControl"
+        type="int"
+        column="ISDISPLAYCONTROL"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="isShowProduct"
+        type="int"
+        column="ISSHOWPRODUCT"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="isShowProductCharacter"
+        type="int"
+        column="ISSHOWPRODUCTCHARACTER"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="productCharacterType"
+        type="java.lang.String"
+        column="PRODUCTCHARACTERTYPE"
+        length="255"
+    />
+    <property
+        name="isShowOrganization"
+        type="int"
+        column="ISSHOWORGANIZATION"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="isShowOrganizationCharacter"
+        type="int"
+        column="ISSHOWORGANIZATIONCHARACTER"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="organizationCharacterType"
+        type="java.lang.String"
+        column="ORGANIZATIONCHARACTERTYPE"
+        length="255"
+    />
+    <property
+        name="description"
+        type="java.lang.String"
+        column="DESCRIPTION"
+        length="255"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+
+    <!-- Associations -->
+  
+    <!-- uni-directional many-to-one association to ProductLayer -->
+    <many-to-one
+        name="productLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.ProductLayer"
+    >
+        <column name="PRODUCTLAYERID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to ProductCharacterLayer -->
+    <many-to-one
+        name="productCharacterLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.ProductCharacterLayer"
+    >
+        <column name="PRODUCTCHARACTERLAYERID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to OrganizationCharacterLayer -->
+    <many-to-one
+        name="organizationCharacterLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.OrganizationCharacterLayer"
+    >
+        <column name="ORGANIZATIONCHARACTERLAYERID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to OperatorUser -->
+    <many-to-one
+        name="operatorUser"
+        class="dmdd.dmddjava.dataaccess.dataobject.OperatorUser"
+    >
+        <column name="OPERATORUSERID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to OrganizationLayer -->
+    <many-to-one
+        name="organizationLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.OrganizationLayer"
+    >
+        <column name="ORGANIZATIONLAYERID" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to UiPopbScopeBizData -->
+    <set
+        name="uiPopbScopeBizDatas"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="UIPOPBSCOPEID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.UiPopbScopeBizData"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to UiPopbScopeProOrg -->
+    <set
+        name="uiPopbScopeProOrgs"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="UIPOPBSCOPEID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.UiPopbScopeProOrg"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

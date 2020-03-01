@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<joined-subclass 
+    name="dmdd.dmddjava.dataaccess.dataobject.ForecastModelMTLa" 
+    table="FORECASTMODELMTLA"
+    extends="dmdd.dmddjava.dataaccess.dataobject.ForecastModelM" 
+>
+
+    <key column="ID"/>
+
+    <property
+        name="dataPeriodNum"
+        type="int"
+        column="DATAPERIODNUM"
+        not-null="true"
+        length="4"
+    />
+    <property
+        name="trendDampingIsValid"
+        type="int"
+        column="TRENDDAMPINGISVALID"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="trendDampingFactor"
+        type="java.lang.Double"
+        column="TRENDDAMPINGFACTOR"
+        not-null="true"
+        length="18"
+    />
+
+    <!-- Associations -->
+  
+
+
+</joined-subclass>
+</hibernate-mapping>

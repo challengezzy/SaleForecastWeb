@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.ForecastModelM" 
+    table="FORECASTMODELM"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+        unsaved-value="0"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="code"
+        type="java.lang.String"
+        column="CODE"
+        not-null="true"
+        length="255"
+    />
+    <property
+        name="name"
+        type="java.lang.String"
+        column="NAME"
+        not-null="true"
+        length="255"
+    />
+    <property
+        name="type"
+        type="int"
+        column="TYPE"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="indicator"
+        type="java.lang.String"
+        column="INDICATOR"
+        not-null="true"
+        length="255"
+    />
+    <property
+        name="source"
+        type="int"
+        column="SOURCE"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="description"
+        type="java.lang.String"
+        column="DESCRIPTION"
+        length="255"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+    <property
+        name="outlierFactor"
+        type="java.lang.Double"
+        column="OUTLIERFACTOR"
+        not-null="true"
+        length="18"
+    />
+    <property
+        name="outlierAnalyzePeriodNum"
+        type="int"
+        column="OUTLIERANALYZEPERIODNUM"
+        not-null="true"
+        length="4"
+    />
+    <property
+        name="outlierDataIsAutoAdjust"
+        type="int"
+        column="OUTLIERDATAISAUTOADJUST"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="outlierDataAdjustHistoryWgt"
+        type="java.lang.Double"
+        column="OUTLIERDATAADJUSTHISTORYWGT"
+        not-null="true"
+        length="18"
+    />
+    <property
+        name="outlierDataAdjustComputeWgt"
+        type="java.lang.Double"
+        column="OUTLIERDATAADJUSTCOMPUTEWGT"
+        not-null="true"
+        length="18"
+    />
+
+    <!-- Associations -->
+  
+    <!-- uni-directional many-to-one association to BizData -->
+    <many-to-one
+        name="historyBizData"
+        class="dmdd.dmddjava.dataaccess.dataobject.BizData"
+    >
+        <column name="HISTORYBIZDATAID" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

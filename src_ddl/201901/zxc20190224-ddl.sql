@@ -1,0 +1,11 @@
+insert into funpermission ( VERSION, TYPE, CODE, NAME, DESCRIPTION, COMMENTS) 
+values ( 0, '0', 'Re-ending-inventory', '期末库存查询', 'rp_ending_inventory', '补货管理'); 
+
+insert into OPERATORUSER_FUNPERMISSION
+  ( VERSION, OPERATORUSERID, FUNPERMISSIONID)
+values ( 0,
+   (select ID from OPERATORUSER where LOGINNAME = 'dmadmin'),
+   (select ID from FUNPERMISSION where DESCRIPTION = 'rp_ending_inventory'));
+   
+   
+

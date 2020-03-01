@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.BizData" 
+    table="BIZDATA"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+        unsaved-value="0"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="code"
+        type="java.lang.String"
+        column="CODE"
+        not-null="true"
+        unique="true"
+        length="255"
+    />
+    <property
+        name="name"
+        type="java.lang.String"
+        column="NAME"
+        not-null="true"
+        unique="true"
+        length="255"
+    />
+    <property
+        name="type"
+        type="int"
+        column="TYPE"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="source"
+        type="int"
+        column="SOURCE"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="isValid"
+        type="int"
+        column="ISVALID"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="description"
+        type="java.lang.String"
+        column="DESCRIPTION"
+        length="255"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to BizDataDefItem -->
+    <set
+        name="bizDataDefItems"
+        lazy="false"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="BIZDATAID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.BizDataDefItem"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

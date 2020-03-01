@@ -1,0 +1,85 @@
+package dmdd.dmddjava.test;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import dmdd.dmddjava.common.utils.UtilMD5;
+
+/**
+ * 
+ * @author zzy
+ *
+ */
+public class SysParamTest {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args)	{
+		int  aa = getPeriod(2018, -1);
+		int  bb = getPeriod(201801, -1);
+		
+		//System.out.println("aa="+aa+",bb=" + bb);
+		
+		
+		
+		String value="120";
+		byte[] values= value.getBytes();
+		try {
+			//System.out.println(dateAddDay("201802",3));
+			
+			//加密
+			System.out.println(UtilMD5.Encrypt("dmddabcd1234admi", values));
+			System.out.println(new String(UtilMD5.Decrypt("gdmu74MpuNZ3K58gBsJMVw==", "dmddabcd1234admi")));
+//			System.out.println(UtilMD5.getMD5Str("31dmdd"));
+//			System.out.println(UtilMD5.getMD5Str("sa"));
+			
+			//解密
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static String dateAddDay(String monthStr, int addDay) throws Exception {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+		Date dt = sdf.parse(monthStr);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(dt);
+		calendar.add(Calendar.MONTH, 1);
+		calendar.add(Calendar.DAY_OF_YEAR, addDay-1);// 日期加N天
+		Date dt1 = calendar.getTime();
+		String reStr = sdf.format(dt1);
+		return reStr;
+	}
+	
+	public static int getPeriod(int _originPeriod, int _addPeriodNum)
+	{
+		int year = _originPeriod/100;
+		int pno = _originPeriod-year*100;
+		
+		int year_rst = year;
+		int pno_rst = pno + _addPeriodNum;
+		int periodNumPerYear = 12;
+		
+		while( pno_rst > periodNumPerYear || pno_rst < 1 )
+		{
+			if( pno_rst > periodNumPerYear )
+			{
+				pno_rst = pno_rst - periodNumPerYear;
+				year_rst = year_rst + 1;
+			}
+			else if( pno_rst < 1 )
+			{
+				pno_rst = pno_rst + periodNumPerYear;
+				year_rst = year_rst - 1;				
+			}
+		}
+		
+		int period_rst = year_rst * 100 + pno_rst;
+
+		return period_rst;
+	}
+}

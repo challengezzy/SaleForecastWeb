@@ -1,0 +1,9 @@
+--初始化期末库存元数据
+insert into META_ENDING_INVENTORY(code,name,WEIGHT_COEFFICIENT,VERSION,UPDATETIME)
+VALUES('01','分仓库存数量',1,1, getdate());
+insert into META_ENDING_INVENTORY(code,name,WEIGHT_COEFFICIENT,VERSION,UPDATETIME)
+VALUES('02','生产待入库',1,1, getdate());
+insert into META_ENDING_INVENTORY(code,name,WEIGHT_COEFFICIENT,VERSION,UPDATETIME)
+VALUES('03','外协数量',1,1, getdate());
+insert into META_ENDING_INVENTORY(code,name,WEIGHT_COEFFICIENT,VERSION,UPDATETIME)
+VALUES('04','出货待检',-1,1, getdate());

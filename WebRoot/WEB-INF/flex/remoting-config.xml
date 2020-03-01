@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="remoting-service" 
+    class="flex.messaging.services.RemotingService">
+
+    <adapters>
+        <adapter-definition id="java-object" class="flex.messaging.services.remoting.adapters.JavaAdapter" default="true"/>
+    </adapters>
+
+    <default-channels>
+        <channel ref="my-amf"/>
+    </default-channels>
+
+	<!--  平台基本功能 -->
+	<destination id="CoolFormService">
+        <properties>
+            <source>com.cool.form.CoolFormService</source>
+        </properties>
+    </destination>
+    
+    <destination id="MetadataTempletService">
+        <properties>
+            <source>com.cool.form.MetadataTempletService</source>
+        </properties>
+    </destination>
+    
+    <!--  added by liuzhen  begin -->
+    <destination id="SystemService">
+        <properties>
+            <source>dmdd.dmddjava.service.systemservice.SystemService</source>
+        </properties>
+    </destination>    
+        
+    <destination id="UnitService">
+        <properties>
+            <source>dmdd.dmddjava.service.dimensionservice.UnitService</source>
+        </properties>
+    </destination> 
+    
+    <destination id="ProductService">
+        <properties>
+            <source>dmdd.dmddjava.service.dimensionservice.ProductService</source>
+        </properties>
+    </destination>     
+    
+    <destination id="OrganizationService">
+        <properties>
+            <source>dmdd.dmddjava.service.dimensionservice.OrganizationService</source>
+        </properties>
+    </destination>
+    
+    <destination id="BizDataService">
+        <properties>
+            <source>dmdd.dmddjava.service.dimensionservice.BizDataService</source>
+        </properties>
+    </destination>
+    
+    <destination id="DistributionCenterService">
+        <properties>
+            <source>dmdd.dmddjava.service.dimensionservice.DistributionCenterService</source>
+        </properties>
+    </destination>  
+    
+    <destination id="SecurityService">
+        <properties>
+            <source>dmdd.dmddjava.service.securityservice.SecurityService</source>
+        </properties>
+    </destination>     
+    
+
+    <destination id="HistoryService">
+        <properties>
+            <source>dmdd.dmddjava.service.historyservice.HistoryService</source>
+        </properties>
+    </destination>       
+
+    
+    <destination id="ForecastService">
+        <properties>
+            <source>dmdd.dmddjava.service.forecastservice.ForecastService</source>
+        </properties>
+    </destination>       
+    
+    <destination id="ReportService">
+        <properties>
+            <source>dmdd.dmddjava.service.reportservice.ReportService</source>
+        </properties>
+    </destination>    
+    
+    <destination id="BulletinService">
+        <properties>
+            <source>dmdd.dmddjava.service.bulletinservice.BulletinService</source>
+        </properties>
+    </destination>       
+    
+    <destination id="UiService">
+        <properties>
+            <source>dmdd.dmddjava.service.uiservice.UiService</source>
+        </properties>
+    </destination>
+    
+	<destination id="UiRowDataService">
+        <properties>
+            <source>dmdd.dmddjava.service.uiservice.UiRowDataService</source>
+        </properties>
+    </destination> 
+    
+	<destination id="PriceService">
+        <properties>
+            <source>dmdd.dmddjava.service.price.PriceService</source>
+        </properties>
+    </destination>     
+         
+    <!--  added by liuzhen    end   -->      
+	<!--  add by luowang begin -->
+	<destination id="InterfaceService">
+        <properties>
+            <source>dmdd.dmddjava.service.ifc.InterfaceService</source>
+        </properties>
+    </destination>   
+    <destination id="InterfaceStandardService">
+        <properties>
+            <source>dmdd.dmddjava.service.ifc.standard.InterfaceStandardService</source>
+        </properties>
+    </destination> 
+     <destination id="ForecastAssessmentService">
+        <properties>
+            <source>dmdd.dmddjava.service.forecastservice.ForecastAssessmentService</source>
+        </properties>
+    </destination> 
+     <destination id="ConversionService">
+        <properties>
+            <source>dmdd.dmddjava.service.conversion.ConversionService</source>
+        </properties>
+    </destination> 
+     <destination id="ForecastHandleService">
+        <properties>
+            <source>dmdd.dmddjava.service.forecastservice.ForecastHandleService</source>
+        </properties>
+    </destination> 
+    <destination id="ReplenishService">
+        <properties>
+            <source>dmdd.dmddjava.service.replenish.ReplenishService</source>
+        </properties>
+    </destination>
+    <destination id="MobileService">
+        <properties>
+            <source>dmdd.dmddjava.service.mobile.MobileService</source>
+        </properties>
+    </destination>
+    
+    <destination id="UIStockService">
+        <properties>
+            <source>dmdd.dmddjava.service.inventory.UIStockService</source>
+        </properties>
+    </destination>
+    
+    <destination id="UIInvReportService">
+        <properties>
+            <source>dmdd.dmddjava.service.invreport.UIInvReportService</source>
+        </properties>
+    </destination>
+    
+    <destination id="UIMainDataService">
+        <properties>
+            <source>dmdd.dmddjava.service.dimensionservice.UIMainDataService</source>
+        </properties>
+    </destination>
+    
+	<!-- add by luowang end -->
+</service>

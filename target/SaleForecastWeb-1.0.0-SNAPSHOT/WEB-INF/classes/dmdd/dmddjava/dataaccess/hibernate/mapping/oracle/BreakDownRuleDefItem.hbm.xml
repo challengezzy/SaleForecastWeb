@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.BreakDownRuleDefItem" 
+    table="BREAKDOWNRULEDEFITEM"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="sequence">
+            <param name="sequence">S_BREAKDOWNRULEDEFITEM</param>
+        </generator>
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+    <property
+        name="isConnected"
+        type="int"
+        column="ISCONNECTED"
+        not-null="true"
+        length="2"
+    />
+  <property
+        name="period"
+        type="int"
+        column="PERIOD"
+        not-null="true"
+        length="6"
+    />
+     <property
+        name="week1"
+        type="int"
+        column="WEEK1"
+        not-null="true"
+        length="6"
+    />
+     <property
+        name="week2"
+        type="int"
+        column="WEEK2"
+        not-null="true"
+        length="6"
+    />
+     <property
+        name="week3"
+        type="int"
+        column="WEEK3"
+        not-null="true"
+        length="6"
+    />
+    
+     <property
+        name="week4"
+        type="int"
+        column="WEEK4"
+        not-null="true"
+        length="6"
+    />
+     <property
+        name="week5"
+        type="int"
+        column="WEEK5"
+        not-null="true"
+        length="6"
+    />
+     <property
+        name="week6"
+        type="int"
+        column="WEEK6"
+        not-null="true"
+        length="6"
+    />
+  <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+    <property
+        name="firstDay"
+        type="int"
+        column="FIRSTDAY"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="num_week"
+        type="int"
+        column="NUM_WEEK"
+        not-null="true"
+        length="4"
+    />
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to BizData -->
+    <many-to-one
+        name="BreakDownRule"
+        class="dmdd.dmddjava.dataaccess.dataobject.BreakDownRule"
+        not-null="true"
+    >
+        <column name="BREAKDOWNRULEID" />
+    </many-to-one>   
+
+</class>
+</hibernate-mapping>

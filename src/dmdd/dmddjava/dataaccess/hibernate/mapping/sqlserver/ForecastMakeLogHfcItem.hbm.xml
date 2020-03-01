@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.ForecastMakeLogHfcItem" 
+    table="FORECASTMAKELOG_HFCITEM"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+        unsaved-value="0"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="period"
+        type="int"
+        column="PERIOD"
+        not-null="true"
+        length="6"
+    />
+    <property
+        name="oldValue"
+        type="long"
+        column="OLDVALUE"
+        not-null="true"
+        length="15"
+    />
+    <property
+        name="newValue"
+        type="long"
+        column="NEWVALUE"
+        not-null="true"
+        length="15"
+    />
+    <property
+        name="description"
+        type="java.lang.String"
+        column="DESCRIPTION"
+        length="255"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to ForecastMakeLog -->
+    <many-to-one
+        name="forecastMakeLog"
+        class="dmdd.dmddjava.dataaccess.dataobject.ForecastMakeLog"
+        not-null="true"
+    >
+        <column name="FORECASTMAKELOGID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to BizData -->
+    <many-to-one
+        name="bizData"
+        class="dmdd.dmddjava.dataaccess.dataobject.BizData"
+    >
+        <column name="BIZDATAID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to Organization -->
+    <many-to-one
+        name="organization"
+        class="dmdd.dmddjava.dataaccess.dataobject.Organization"
+    >
+        <column name="ORGANIZATIONID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to ProductCharacter -->
+    <many-to-one
+        name="productCharacter"
+        class="dmdd.dmddjava.dataaccess.dataobject.ProductCharacter"
+    >
+        <column name="PRODUCTCHARACTERID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to OrganizationCharacter -->
+    <many-to-one
+        name="organizationCharacter"
+        class="dmdd.dmddjava.dataaccess.dataobject.OrganizationCharacter"
+    >
+        <column name="ORGANIZATIONCHARACTERID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to Product -->
+    <many-to-one
+        name="product"
+        class="dmdd.dmddjava.dataaccess.dataobject.Product"
+    >
+        <column name="PRODUCTID" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

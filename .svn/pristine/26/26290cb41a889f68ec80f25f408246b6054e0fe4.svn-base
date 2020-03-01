@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.Product" 
+    table="PRODUCT"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+        unsaved-value="0"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="code"
+        type="java.lang.String"
+        column="CODE"
+        not-null="true"
+        unique="true"
+        length="255"
+    />
+    <property
+        name="name"
+        type="java.lang.String"
+        column="NAME"
+        not-null="true"
+        length="255"
+    />
+    <property
+        name="isCatalog"
+        type="int"
+        column="ISCATALOG"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="isValid"
+        type="int"
+        column="ISVALID"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="description"
+        type="java.lang.String"
+        column="DESCRIPTION"
+        length="255"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+ 	<property
+        name="pathCode"
+        type="java.lang.String"
+        column="PATHCODE"
+        length="512"
+    />
+    <property
+        name="isSuit"
+        type="java.lang.Integer"
+        column="IS_SUIT"
+        not-null="false"
+        length="2"
+    />
+    <property
+        name="shelfLife"
+        type="java.lang.Integer"
+        column="SHELF_LIFE"
+        not-null="false"
+        length="4"
+    />
+    <property
+        name="purchaseLeadTime"
+        type="java.lang.Integer"
+        column="PURCHASE_LEAD_TIME"
+        not-null="false"
+        length="4"
+    />
+    <property
+        name="withdrawLeadTime"
+        type="java.lang.Integer"
+        column="WITHDRAW_LEAD_TIME"
+        not-null="false"
+        length="4"
+    />
+
+    <!-- Associations -->
+  
+    <!-- uni-directional many-to-one association to ProductLayer -->
+    <many-to-one
+        name="productLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.ProductLayer"
+    >
+        <column name="PRODUCTLAYERID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to UnitGroup -->
+    <many-to-one
+        name="unitGroup"
+        class="dmdd.dmddjava.dataaccess.dataobject.UnitGroup"
+    >
+        <column name="UNITGROUPID" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to ProductProCharacter -->
+    <set
+        name="productProCharacters"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="PRODUCTID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.ProductProCharacter"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to Product -->
+    <set
+        name="subProducts"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="PARENTPRODUCTID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.Product"
+        />
+    </set>
+    <!-- bi-directional many-to-one association to Product -->
+    <many-to-one
+        name="parentProduct"
+        class="dmdd.dmddjava.dataaccess.dataobject.Product"
+        not-null="true"
+    >
+        <column name="PARENTPRODUCTID" />
+    </many-to-one>
+ 
+    <!-- uni-directional many-to-one association to Unit -->
+    <many-to-one
+        name="unit"
+        class="dmdd.dmddjava.dataaccess.dataobject.Unit"
+    >
+        <column name="UNITID" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

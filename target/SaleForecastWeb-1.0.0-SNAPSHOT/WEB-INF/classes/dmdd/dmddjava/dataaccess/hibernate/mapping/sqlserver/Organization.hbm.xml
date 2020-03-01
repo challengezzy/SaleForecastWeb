@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.Organization" 
+    table="ORGANIZATION"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+        unsaved-value="0"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="code"
+        type="java.lang.String"
+        column="CODE"
+        not-null="true"
+        unique="true"
+        length="255"
+    />
+    <property
+        name="name"
+        type="java.lang.String"
+        column="NAME"
+        not-null="true"
+        length="255"
+    />
+    <property
+        name="isCatalog"
+        type="int"
+        column="ISCATALOG"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="isValid"
+        type="int"
+        column="ISVALID"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="description"
+        type="java.lang.String"
+        column="DESCRIPTION"
+        length="255"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+ <property
+        name="pathCode"
+        type="java.lang.String"
+        column="PATHCODE"
+        length="512"
+    />
+    <property
+        name="dcId"
+        type="long"
+        column="DISTRIBUTIONCENTERID"
+        not-null="false"
+        length="2"
+    />
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to OrganizationOrgCharacter -->
+    <set
+        name="organizationOrgCharacters"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="ORGANIZATIONID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.OrganizationOrgCharacter"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to Organization -->
+    <set
+        name="subOrganizations"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="PARENTORGANIZATIONID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.Organization"
+        />
+    </set>
+    <!-- bi-directional many-to-one association to Organization -->
+    <many-to-one
+        name="parentOrganization"
+        class="dmdd.dmddjava.dataaccess.dataobject.Organization"
+        not-null="true"
+    >
+        <column name="PARENTORGANIZATIONID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to OrganizationLayer -->
+    <many-to-one
+        name="organizationLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.OrganizationLayer"
+    >
+        <column name="ORGANIZATIONLAYERID" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

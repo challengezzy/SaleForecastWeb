@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<joined-subclass 
+    name="dmdd.dmddjava.dataaccess.dataobject.BizDataDefItemKpi" 
+    table="BIZDATADEFITEMKPI"
+    extends="dmdd.dmddjava.dataaccess.dataobject.BizDataDefItem"
+>
+
+    <key column="ID"/>
+
+    <property
+        name="kpiFormula"
+        type="int"
+        column="KPIFORMULA"
+        not-null="true"
+        length="2"
+    />
+
+    <!-- Associations -->
+  
+    <!-- uni-directional many-to-one association to BizData -->
+    <many-to-one
+        name="bitemBizData"
+        class="dmdd.dmddjava.dataaccess.dataobject.BizData"
+    >
+        <column name="BITEMBIZDATAID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to BizData -->
+    <many-to-one
+        name="aitemBizData"
+        class="dmdd.dmddjava.dataaccess.dataobject.BizData"
+    >
+        <column name="AITEMBIZDATAID" />
+    </many-to-one>
+
+</joined-subclass>
+</hibernate-mapping>

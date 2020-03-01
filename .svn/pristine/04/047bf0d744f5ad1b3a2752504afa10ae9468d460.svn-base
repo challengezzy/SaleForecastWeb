@@ -1,0 +1,876 @@
+package dmdd.dmddjava.service.replenish;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
+import com.cool.common.constant.DMOConst;
+import com.cool.common.logging.CoolLogger;
+import com.cool.common.vo.HashVO;
+import com.cool.dbaccess.CommDMO;
+
+import dmdd.dmddjava.common.system.ServerEnvironment;
+import dmdd.dmddjava.common.utils.UtilPeriod;
+import dmdd.dmddjava.dataaccess.aidobject.ABUiRowDataCurrentProDC;
+import dmdd.dmddjava.dataaccess.aidobject.ABUiRowDataProDC;
+import dmdd.dmddjava.dataaccess.aidobject.ABUiRowDataProDCAbstract;
+import dmdd.dmddjava.dataaccess.aidobject.ABUiRowDataProDCDetail;
+
+public class ReplenishQueryService {
+
+	private Logger logger = CoolLogger.getLogger(this.getClass());
+
+	private CommDMO dmo = new CommDMO();
+
+	private MetaTermEndService termEndService = new MetaTermEndService(dmo);
+	
+	private int curPeriod = ServerEnvironment.getInstance().getSysPeriod()
+			.getForecastRunPeriod(); // 获取当前系统期间
+
+	private String cataPrefix = "CATA";
+
+	/**
+	 * 按分仓，进行N期数据查询
+	 * 
+	 * @param pidList
+	 * @param dcidList
+	 * @param beginPeriod
+	 * @param endPeriod
+	 * @param dataType
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ABUiRowDataProDC> getReplenishDataByMultiPeriod(
+			List<String> pidList, List<String> dcidList, int beginPeriod,
+			int endPeriod, String dataType) throws Exception {
+
+		HashMap<String, ABUiRowDataProDC> dataIndex = new HashMap<String, ABUiRowDataProDC>();
+		HashMap<String, ABUiRowDataProDC> dcIndex = new HashMap<String, ABUiRowDataProDC>();
+
+		String dcids = getQueryIds(dcidList);
+		String pids = getQueryIds(pidList);
+
+		String dataColumn = dataType;// SELLIN,SELLOUT,TERMEND,TERMBEGIN,STOCKDAY
+		StringBuilder sb = new StringBuilder();
+		// tree
+		sb.append(" ;with sub_distribute as (  select * from distributioncenter where id in ("
+				+ dcids + ") ");
+		sb.append(" union all  select d.* from distributioncenter d inner join sub_distribute t on ( d.PARENTDCID = t.id )), ");
+		sb.append(" sub_product as ( select * from PRODUCT where id in ("
+				+ pids + ") ");
+		sb.append(" union all select d.* from PRODUCT d inner join sub_product t on ( d.PARENTPRODUCTID = t.id )) ");
+		// logic
+		sb.append(" SELECT 'RD'+cast(RD.ID as nvarchar) ID,RD.DCID,DC.CODE DCCODE,DC.NAME DCNAME,");
+		sb.append(" (SELECT NAME FROM UNITGROUP UG WHERE UG.ID=P.UNITGROUPID ) UNITGROUPNAME,");// 单位、单位组
+		sb.append(" (SELECT NAME FROM UNIT UN WHERE UN.ID=P.UNITID) UNITNAME,");
+		sb.append("  RD.PRODUCTID,P.CODE PCODE,P.NAME PNAME,");
+		// sb.append(" DC.ID||DC.NAME PARENTTREEID,");
+
+		int periodDiff = UtilPeriod.getPeriodDifference(beginPeriod, endPeriod);
+		// 查询N期数据
+		for (int i = 0; i <= periodDiff; i++) {
+			int tempPeriod = UtilPeriod.getPeriod(beginPeriod, i);
+
+			sb.append(" (SELECT RD1."
+					+ dataColumn
+					+ " FROM REPLENISHDATA RD1 WHERE RD1.PRODUCTID=RD.PRODUCTID AND RD1.DCID=RD.DCID ");
+			sb.append("   AND RD1.PERIOD=" + tempPeriod + " ) PERIOD" + i
+					+ ", "); // getMonth(RD.PERIOD,"+i+")
+		}
+		sb.append(" RD.COMMENTS");
+		sb.append(" FROM REPLENISHDATA RD,PRODUCT P,DISTRIBUTIONCENTER DC ");
+		sb.append(" WHERE P.ID=RD.PRODUCTID AND DC.ID=RD.DCID AND RD.PERIOD="
+				+ curPeriod + ""); // 从当前期间开始查询
+		sb.append(" AND RD.DCID IN ( select id from sub_distribute ) "); // 产品条件
+		sb.append(" AND P.ID IN ( select id from sub_product ) "); // DC条件
+		sb.append(" ORDER BY DCLAYER,DCNAME,PCODE");
+
+		// 可以根据条件选择是否要形成树级结构
+
+		HashVO[] dataVos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				sb.toString());
+
+		StringBuilder dcsb = new StringBuilder();
+		dcsb.append(" with sub_distribute as ( select * from distributioncenter where id in ("
+				+ dcids + ")  ");
+		dcsb.append(" union all  select d.* from distributioncenter d inner join sub_distribute t on ( d.PARENTDCID = t.id )) ");
+		dcsb.append("SELECT DC.ID,DC.PARENTDCID,DC.NAME,DC.CODE,");
+		dcsb.append(" DC.DCLAYER ");
+		dcsb.append(" FROM DISTRIBUTIONCENTER DC");
+		dcsb.append(" WHERE 1=1");
+		dcsb.append(" AND DC.ID IN ( select id from sub_distribute )");
+		dcsb.append(" ORDER BY DCLAYER DESC");
+
+		// 查询DC数据表
+		HashVO[] dcVos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				dcsb.toString());
+
+		new ArrayList<ABUiRowDataProDC>(dataVos.length + dcVos.length);
+
+		// 加入详细数据结果列
+		for (int i = 0; i < dataVos.length; i++) {
+			ABUiRowDataProDC rowData = getDataProDCByReplenishData(dataVos[i]);
+			dataIndex.put(rowData.getId(), rowData);
+		}
+
+		ArrayList<ABUiRowDataProDC> dcList = new ArrayList<ABUiRowDataProDC>(
+				dcVos.length);// 排序的DC列表
+		// 加入虚拟上级结果
+		for (HashVO dcvo : dcVos) {
+			ABUiRowDataProDC rowData = getDataProDCByDC(dcvo);
+			dcIndex.put(rowData.getId(), rowData);
+			dcList.add(rowData);
+		}
+
+		List<ABUiRowDataProDC> dataList = generateProDCTreeList(dataIndex,
+				dcIndex, dcList);
+
+		logger.info("查询分仓补货数据OK！");
+
+		return dataList;
+	}
+
+	/**
+	 * 按分仓，进行N期history数据查询
+	 * 
+	 * @param pidList
+	 * @param dcidList
+	 * @param beginPeriod
+	 * @param endPeriod
+	 * @param dataType
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ABUiRowDataProDC> getReplenishHistoryDataByMultiPeriod(
+			List<String> pidList, List<String> dcidList, int beginPeriod,
+			int endPeriod, String dataType) throws Exception {
+
+		HashMap<String, ABUiRowDataProDC> dataIndex = new HashMap<String, ABUiRowDataProDC>();
+		HashMap<String, ABUiRowDataProDC> dcIndex = new HashMap<String, ABUiRowDataProDC>();
+
+		String dcids = getQueryIds(dcidList);
+		String pids = getQueryIds(pidList);
+
+		String dataColumn = dataType;// SELLIN,SELLOUT,TERMEND,TERMBEGIN,STOCKDAY
+		StringBuilder sb = new StringBuilder();
+		// tree
+		sb.append(" ;with sub_distribute as (  select * from distributioncenter where id in ("
+				+ dcids + ") ");
+		sb.append(" union all  select d.* from distributioncenter d inner join sub_distribute t on ( d.PARENTDCID = t.id )), ");
+		sb.append(" sub_product as ( select * from PRODUCT where id in ("
+				+ pids + ") ");
+		sb.append(" union all select d.* from PRODUCT d inner join sub_product t on ( d.PARENTPRODUCTID = t.id )) ");
+		// logic
+		sb.append("SELECT  'RD'+cast(RD.ID as nvarchar) ID,RD.DCID,DC.CODE DCCODE,DC.NAME DCNAME,");
+		sb.append(" (SELECT NAME FROM UNITGROUP UG WHERE UG.ID=P.UNITGROUPID ) UNITGROUPNAME,");// 单位、单位组
+		sb.append(" (SELECT NAME FROM UNIT UN WHERE UN.ID=P.UNITID) UNITNAME,");
+		sb.append("  RD.PRODUCTID,P.CODE PCODE,P.NAME PNAME,");
+
+		int periodDiff = UtilPeriod.getPeriodDifference(beginPeriod, endPeriod);
+		// 查询N期数据
+		for (int i = 0; i <= periodDiff; i++) {
+			int tempPeriod = UtilPeriod.getPeriod(beginPeriod, i);
+
+			sb.append(" (SELECT RD1."
+					+ dataColumn
+					+ " FROM replenishhisdata RD1 WHERE RD1.PRODUCTID=RD.PRODUCTID AND RD1.DCID=RD.DCID ");
+			sb.append("   AND RD1.PERIOD=" + tempPeriod + " ) PERIOD" + i
+					+ ", "); // getMonth(RD.PERIOD,"+i+")
+		}
+		sb.append(" RD.COMMENTS");
+		sb.append(" FROM replenishhisdata RD,PRODUCT P,DISTRIBUTIONCENTER DC ");
+		sb.append(" WHERE P.ID=RD.PRODUCTID AND DC.ID=RD.DCID AND RD.PERIOD="
+				+ endPeriod + ""); // 从当前期间开始查询
+		sb.append(" AND RD.DCID IN ( select id from sub_distribute ) "); // 产品条件
+		sb.append(" AND P.ID IN ( select id from sub_product ) "); // DC条件
+		sb.append(" ORDER BY DCLAYER,DCNAME,PCODE");
+
+		// 可以根据条件选择是否要形成树级结构
+
+		HashVO[] dataVos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				sb.toString());
+
+		StringBuilder dcsb = new StringBuilder();
+		dcsb.append(" with sub_distribute as ( select * from distributioncenter where id in ("
+				+ dcids + ")  ");
+		dcsb.append(" union all  select d.* from distributioncenter d inner join sub_distribute t on ( d.PARENTDCID = t.id )) ");
+
+		dcsb.append("SELECT DC.ID,DC.PARENTDCID,DC.NAME,DC.CODE,");
+		dcsb.append(" DC.DCLAYER ");
+		dcsb.append(" FROM DISTRIBUTIONCENTER DC");
+		dcsb.append(" WHERE 1=1");
+		dcsb.append(" AND DC.ID IN ( select id from sub_distribute )");
+		dcsb.append(" ORDER BY DCLAYER DESC");
+
+		// 查询DC数据表
+		HashVO[] dcVos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				dcsb.toString());
+
+		new ArrayList<ABUiRowDataProDC>(dataVos.length + dcVos.length);
+
+		// 加入详细数据结果列
+		for (int i = 0; i < dataVos.length; i++) {
+			ABUiRowDataProDC rowData = getDataProDCByReplenishData(dataVos[i]);
+			dataIndex.put(rowData.getId(), rowData);
+		}
+
+		ArrayList<ABUiRowDataProDC> dcList = new ArrayList<ABUiRowDataProDC>(
+				dcVos.length);// 排序的DC列表
+		// 加入虚拟上级结果
+		for (HashVO dcvo : dcVos) {
+			ABUiRowDataProDC rowData = getDataProDCByDC(dcvo);
+			dcIndex.put(rowData.getId(), rowData);
+			dcList.add(rowData);
+		}
+
+		List<ABUiRowDataProDC> dataList = generateProDCTreeList(dataIndex,
+				dcIndex, dcList);
+
+		logger.info("查询分仓补货数据OK！");
+
+		return dataList;
+	}
+
+	private List<ABUiRowDataProDC> generateProDCTreeList(
+			HashMap<String, ABUiRowDataProDC> dataIndex,
+			HashMap<String, ABUiRowDataProDC> dcIndex,
+			ArrayList<ABUiRowDataProDC> dcList) throws Exception {
+		ArrayList<ABUiRowDataProDC> dataList = new ArrayList<ABUiRowDataProDC>(
+				dcList.size());
+
+		/**
+		 * 根据数据对象、DC目录对象构造一个目录树，DC为目录，如果DC目录中有下级DC目录，则DC上再创建一个虚拟目录，包含DC及其下级目录。
+		 * 如北区下，包含西安、郑州库，则创建一个新的“北区”目录，其子级包含(北区、西安、郑州) dataIndex的数据直接挂靠到对应的dc目录下
+		 */
+
+		// 1,处理dataIndex数据挂靠
+		Iterator<String> it = dataIndex.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			ABUiRowDataProDC row = dataIndex.get(key);
+
+			String parentId = row.getParentId();
+			if (parentId == null || "".equals(parentId)) {
+				dataList.add(row);
+			} else {
+				ABUiRowDataProDC parent = dcIndex.get(parentId);
+				// 非顶级DC,但是在当前数据中没有其父级DC
+				if (parent == null) {
+					dataList.add(row);
+				} else {
+					parent.addChildVo(row);
+				}
+			}
+		}
+
+		HashMap<String, ABUiRowDataProDC> dcCataIndex = new HashMap<String, ABUiRowDataProDC>();
+		// 2,处理DC目录信息，根据需要再生成父级虚拟DC
+		for (int i = 0; i < dcList.size(); i++) {
+			ABUiRowDataProDC dcrow = dcIndex.get(dcList.get(i).getId());
+
+			String parentId = dcrow.getParentId();
+			if (parentId != null) {
+				ABUiRowDataProDC parentDc = dcIndex.get(parentId);
+				ABUiRowDataProDC parentCata = dcCataIndex.get(cataPrefix
+						+ parentId);
+				// 非顶级DC,但是在当前数据中没有其父级DC
+				if (parentDc != null) {
+					// 父结构数据找到，要构造一个虚拟的父目录，其父目录与现在目录同级
+					if (parentCata == null) {
+						parentCata = new ABUiRowDataProDC();
+						parentCata.setId(cataPrefix + parentId);
+						parentCata.setDcCode(parentDc.getDcCode());
+						parentCata.setDcName(parentDc.getDcName());
+
+						String parentCateParentId = parentDc.getParentId();
+						if (parentCateParentId != null
+								&& parentCateParentId.indexOf(cataPrefix) < 0)
+							parentCateParentId = cataPrefix
+									+ parentCateParentId;
+
+						parentCata.setParentId(parentCateParentId);
+
+						dcCataIndex.put(parentCata.getId(), parentCata); // 添加虚拟目录
+
+						// parentDc.setParentId(parentCata.getId());
+						parentCata.addChildVo(parentDc);
+					}
+
+				}
+				if (parentCata != null
+						&& dcCataIndex.get(cataPrefix + dcrow.getId()) == null) { // 最明细DC,如果是非明细DC,在创建parentCata时已经关联
+					dcrow.setParentId(parentCata.getId());
+					parentCata.addChildVo(dcrow);
+				}
+			}
+		}
+
+		// 3, 将虚拟DC的最上级加入列表
+		it = dcCataIndex.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			ABUiRowDataProDC catalogRow = dcCataIndex.get(key);
+
+			String parentId = catalogRow.getParentId();
+			if (parentId == null || "".equals(parentId)) {
+				dataList.add(catalogRow);
+			} else {
+				ABUiRowDataProDC parentCata = dcCataIndex.get(parentId);
+				if (parentCata == null
+						&& dcCataIndex.get(cataPrefix + parentId) == null) {
+					dataList.add(catalogRow);
+				} else {
+					parentCata.addChildVo(catalogRow);
+				}
+			}
+		}
+
+		// 4,加入DC目录加入列表，目的是处理是处理只有一层DC的情况
+		it = dcIndex.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			ABUiRowDataProDC dcrow = dcIndex.get(key);
+
+			String dcParentId = dcrow.getParentId();
+			if (dcParentId != null) { // 这里只处理非顶级DC
+				if (!dcParentId.startsWith(cataPrefix)) {
+					dcParentId = cataPrefix + dcrow.getParentId();
+				}
+
+				ABUiRowDataProDC parentCataDC = dcCataIndex.get(dcParentId);
+				if (parentCataDC == null) {
+					parentCataDC = dcCataIndex.get(cataPrefix + dcrow.getId());
+					if (parentCataDC == null)
+						dataList.add(dcrow); // 根据cata+id, 或者 id均找不到父节点的情况
+				}
+			}
+		}
+
+		return dataList;
+	}
+
+	/**
+	 * 转换分仓数据列数据
+	 * 
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	private ABUiRowDataProDC getDataProDCByDC(HashVO vo) throws Exception {
+		ABUiRowDataProDC data = new ABUiRowDataProDC();
+		data.setId(vo.getStringValue("ID"));
+		data.setParentId(vo.getStringValue("PARENTDCID"));
+		data.setDcCode(vo.getStringValue("CODE"));
+		data.setDcName(vo.getStringValue("NAME"));
+		data.setPeriodBegin(curPeriod);
+
+		// 赋值一个空数组，可以在界面上显示为一个叶子节点
+		data.setChildren(new ArrayList<ABUiRowDataProDCAbstract>());
+
+		return data;
+	}
+
+	/**
+	 * 补货预测数据转换
+	 * 
+	 * @param vo
+	 * @return
+	 * @throws Exception
+	 */
+	private ABUiRowDataProDC getDataProDCByReplenishData(HashVO vo)
+			throws Exception {
+		ABUiRowDataProDC data = new ABUiRowDataProDC();
+		data.setId(vo.getStringValue("ID"));
+		data.setParentId(vo.getStringValue("DCID"));
+
+		data.setDcId(vo.getStringValue("DCID"));
+		data.setDcCode(vo.getStringValue("DCCODE"));
+		data.setDcName(vo.getStringValue("DCNAME"));
+
+		data.setProId(vo.getStringValue("PRODUCTID"));
+		data.setProCode(vo.getStringValue("PCODE"));
+		data.setProName(vo.getStringValue("PNAME"));
+		data.setUnitGroupName(vo.getStringValue("UNITGROUPNAME"));
+		data.setUnitName(vo.getStringValue("UNITNAME"));
+
+		// 期间字段
+		data.setPeriodDataValue00(vo.getStringValue("PERIOD0"));
+		data.setPeriodDataValue01(vo.getStringValue("PERIOD1"));
+		data.setPeriodDataValue02(vo.getStringValue("PERIOD2"));
+		data.setPeriodDataValue03(vo.getStringValue("PERIOD3"));
+		data.setPeriodDataValue04(vo.getStringValue("PERIOD4"));
+		data.setPeriodDataValue05(vo.getStringValue("PERIOD5"));
+		data.setPeriodDataValue06(vo.getStringValue("PERIOD6"));
+		data.setPeriodDataValue07(vo.getStringValue("PERIOD7"));
+		data.setPeriodDataValue08(vo.getStringValue("PERIOD8"));
+		data.setPeriodDataValue09(vo.getStringValue("PERIOD9"));
+		data.setPeriodDataValue10(vo.getStringValue("PERIOD10"));
+		data.setPeriodDataValue11(vo.getStringValue("PERIOD11"));
+		data.setPeriodDataValue12(vo.getStringValue("PERIOD12"));
+		data.setPeriodDataValue13(vo.getStringValue("PERIOD13"));
+		data.setPeriodDataValue14(vo.getStringValue("PERIOD14"));
+		data.setPeriodDataValue15(vo.getStringValue("PERIOD15"));
+		data.setPeriodDataValue16(vo.getStringValue("PERIOD16"));
+		data.setPeriodDataValue17(vo.getStringValue("PERIOD17"));
+		data.setPeriodDataValue18(vo.getStringValue("PERIOD18"));
+		data.setPeriodDataValue19(vo.getStringValue("PERIOD19"));
+		data.setPeriodDataValue20(vo.getStringValue("PERIOD20"));
+		data.setPeriodDataValue21(vo.getStringValue("PERIOD21"));
+		data.setPeriodDataValue22(vo.getStringValue("PERIOD22"));
+		data.setPeriodDataValue23(vo.getStringValue("PERIOD23"));
+		data.setPeriodDataValue22(vo.getStringValue("PERIOD24"));
+		data.setPeriodDataValue23(vo.getStringValue("PERIOD25"));
+
+		data.setPeriodBegin(curPeriod);
+
+		return data;
+	}
+
+	private ABUiRowDataCurrentProDC getCurrentProDCByReplenishData(HashVO vo)
+			throws Exception {
+		ABUiRowDataCurrentProDC data = new ABUiRowDataCurrentProDC();
+		data.setId(vo.getStringValue("ID"));
+		data.setParentId(vo.getStringValue("DCID"));
+
+		data.setDcId(vo.getStringValue("DCID"));
+		data.setDcCode(vo.getStringValue("DCCODE"));
+		data.setDcName(vo.getStringValue("DCNAME"));
+
+		data.setProId(vo.getStringValue("PRODUCTID"));
+		data.setProCode(vo.getStringValue("PCODE"));
+		data.setProName(vo.getStringValue("PNAME"));
+		data.setUnitGroupName(vo.getStringValue("UNITGROUPNAME"));
+		data.setUnitName(vo.getStringValue("UNITNAME"));
+
+		data.setSellIn(vo.getStringValue("SELLIN"));
+		data.setSellOut(vo.getStringValue("SELLOUT"));
+		data.setTermBegin(vo.getStringValue("TERMBEGIN"));
+		data.setTermEnd(vo.getStringValue("TERMEND"));
+		data.setStockDay(vo.getStringValue("STOCKDAY"));
+		data.setComputeTime(vo.getStringValue("COMPUTETIME"));
+
+		return data;
+	}
+
+	private ABUiRowDataCurrentProDC getCurrentProDCByDC(HashVO vo)
+			throws Exception {
+		ABUiRowDataCurrentProDC data = new ABUiRowDataCurrentProDC();
+		data.setId(vo.getStringValue("ID"));
+		data.setParentId(vo.getStringValue("PARENTDCID"));
+		data.setDcCode(vo.getStringValue("CODE"));
+		data.setDcName(vo.getStringValue("NAME"));
+
+		data.setChildren(new ArrayList<ABUiRowDataProDCAbstract>(0));
+
+		return data;
+	}
+
+	/**
+	 * 查询指定产品、分仓的多期间数据
+	 * 
+	 * @param proId
+	 * @param dcId
+	 * @param beginPeriod
+	 * @param endPeriod
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ABUiRowDataProDCDetail> getDetailDataByProDC(String proId,
+			String dcId, int beginPeriod, int endPeriod) throws Exception {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("SELECT ID,PRODUCTID,DCID,PERIOD,SELLIN,SELLOUT,TERMEND,TERMBEGIN,STOCKDAY,UPDATETIME,COMPUTETIME");
+		sb.append(" FROM REPLENISHDATA RD WHERE RD.PRODUCTID=" + proId
+				+ " AND RD.DCID=" + dcId + "");
+		sb.append(" AND PERIOD >=" + beginPeriod + " AND PERIOD < " + endPeriod
+				+ "");// 期间限定
+		sb.append(" ORDER BY PERIOD");
+
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				sb.toString());
+
+		List<ABUiRowDataProDCDetail> detailList = new ArrayList<ABUiRowDataProDCDetail>(
+				vos.length);
+		for (HashVO vo : vos) {
+
+			ABUiRowDataProDCDetail detail = new ABUiRowDataProDCDetail();
+			detail.setPeriod(vo.getIntegerValue("PERIOD"));
+			detail.setSellIn(vo.getLongValue("SELLIN"));
+			detail.setSellOut(vo.getLongValue("SELLOUT"));
+			detail.setTermEnd(vo.getLongValue("TERMEND"));
+			detail.setTermBegin(vo.getLongValue("TERMBEGIN"));
+			detail.setStockDay(vo.getLongValue("STOCKDAY"));
+
+			detailList.add(detail);
+		}
+
+		logger.debug("查询单分仓、单产品数据OK，查到到[" + detailList.size() + "]条。");
+
+		return detailList;
+	}
+
+	/**
+	 * 查询指定产品、分仓的多期间history数据
+	 * 
+	 * @param proId
+	 * @param dcId
+	 * @param beginPeriod
+	 * @param endPeriod
+	 * @return
+	 * @throws Exception
+	 */
+	public List<ABUiRowDataProDCDetail> getDetailHistoryDataByProDC(
+			String proId, String dcId, int beginPeriod, int endPeriod)
+			throws Exception {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("SELECT ID,PRODUCTID,DCID,PERIOD,SELLIN,SELLOUT,TERMEND,TERMBEGIN,UPDATETIME,COMPUTETIME");
+		sb.append(" FROM replenishdata RD WHERE RD.PRODUCTID=" + proId
+				+ " AND RD.DCID=" + dcId + "");
+		sb.append(" AND PERIOD >=" + beginPeriod + " AND PERIOD < " + endPeriod
+				+ "");// 期间限定
+		sb.append(" ORDER BY PERIOD");
+
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				sb.toString());
+
+		List<ABUiRowDataProDCDetail> detailList = new ArrayList<ABUiRowDataProDCDetail>(
+				vos.length);
+		for (HashVO vo : vos) {
+
+			ABUiRowDataProDCDetail detail = new ABUiRowDataProDCDetail();
+			detail.setPeriod(vo.getIntegerValue("PERIOD"));
+			detail.setSellIn(vo.getLongValue("SELLIN"));
+			detail.setSellOut(vo.getLongValue("SELLOUT"));
+			detail.setTermEnd(vo.getLongValue("TERMEND"));
+			detail.setTermBegin(vo.getLongValue("TERMBEGIN"));
+			// detail.setStockDay(vo.getLongValue("STOCKDAY"));
+
+			detailList.add(detail);
+		}
+
+		logger.debug("查询单分仓、单产品数据OK，查到到[" + detailList.size() + "]条。");
+
+		return detailList;
+	}
+
+	public List<ABUiRowDataCurrentProDC> getTermEndDataByPeriod(
+			List<String> pidList, List<String> dcidList, int period)
+			throws Exception {
+
+		HashMap<String, ABUiRowDataCurrentProDC> dataIndex = new HashMap<String, ABUiRowDataCurrentProDC>();
+		HashMap<String, ABUiRowDataCurrentProDC> dcIndex = new HashMap<String, ABUiRowDataCurrentProDC>();
+
+		String dcids = getQueryIds(dcidList);
+		String pids = getQueryIds(pidList);
+
+		StringBuilder sb = new StringBuilder();
+		// tree sql
+		sb.append(" ;with sub_distribute as (  select * from distributioncenter where id in (" + dcids+ ") union all ");
+		sb.append(" select d.* from distributioncenter d inner join sub_distribute t on ( d.PARENTDCID = t.id )), ");
+		sb.append(" sub_product as ( select * from PRODUCT where id in ("+ pids + ") union all ");
+		sb.append(" select d.* from PRODUCT d inner join sub_product t on ( d.PARENTPRODUCTID = t.id )) ");
+		
+		sb.append(" SELECT 'TM'+cast(ED.ID as nvarchar) ID,ED.DCID,DC.CODE DCCODE,DC.NAME DCNAME, ");
+		sb.append(" (SELECT NAME FROM UNITGROUP UG WHERE UG.ID=P.UNITGROUPID ) UNITGROUPNAME, ");
+		sb.append(" (SELECT NAME FROM UNIT UN WHERE UN.ID=P.UNITID) UNITNAME,  ");
+		sb.append(" ED.PRODUCTID,P.CODE PCODE,P.NAME PNAME, ED.ID as TERM_END_ID,ED.VALUE as TERM_END_VALUE," +
+				" ED.ENDINV_CODE,ED.PERIOD as TERM_END_PERIOD,ED.UPDATETIME, ED.COMMENTS ");
+		sb.append("  FROM ENDING_INVENTORY_DATA ED,PRODUCT P,DISTRIBUTIONCENTER DC  ");
+		sb.append(" WHERE P.ID=ED.PRODUCTID AND DC.ID=ED.DCID AND ED.PERIOD="+ period +"");
+		sb.append("  AND ED.DCID IN ( select id from sub_distribute )  ");
+		sb.append(" AND P.ID IN ( select id from sub_product ) ");
+		sb.append("   ORDER BY DCLAYER,DCNAME,PCODE ");
+		
+		// 可以根据条件选择是否要形成树级结构
+
+		HashVO[] dataVos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				sb.toString());
+
+		StringBuilder dcsb = new StringBuilder();
+		dcsb.append(" with sub_distribute as ( select * from distributioncenter where id in ("
+				+ dcids + ") ");
+		dcsb.append(" union all  select d.* from distributioncenter d inner join sub_distribute t on ( d.PARENTDCID = t.id ))");
+		dcsb.append(" SELECT DC.ID,DC.PARENTDCID,DC.NAME,DC.CODE,");
+		dcsb.append(" DC.DCLAYER ");
+		dcsb.append(" FROM DISTRIBUTIONCENTER DC");
+		dcsb.append(" WHERE 1=1");
+		dcsb.append(" AND DC.ID IN ( SELECT id from sub_distribute )");
+		dcsb.append(" ORDER BY DC.DCLAYER DESC");
+
+		// 查询DC数据表
+		HashVO[] dcVos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				dcsb.toString());
+
+		// 加入详细数据结果列
+		for (int i = 0; i < dataVos.length; i++) {
+			ABUiRowDataCurrentProDC rowData = getTermEndDCByReplenishData(dataVos[i]);
+			dataIndex.put(rowData.getId(), rowData);
+		}
+
+		// add by zhangzy 由于hashtable的内部排序机制，dcIndex的内容不是排序好的数据，需要一个排序好的DC数据
+		ArrayList<ABUiRowDataCurrentProDC> dcList = new ArrayList<ABUiRowDataCurrentProDC>(
+				dcVos.length);// 排序的DC列表
+
+		// 加入虚拟上级结果
+		for (HashVO dcvo : dcVos) {
+			ABUiRowDataCurrentProDC rowData = getCurrentProDCByDC(dcvo);
+			dcIndex.put(rowData.getId(), rowData);
+			dcList.add(rowData);
+		}
+
+		List<ABUiRowDataCurrentProDC> dataList = generateCurrentProDCTreeList(
+				dataIndex, dcIndex, dcList);
+
+		logger.info("查询[" + period + "]期分仓补货数据OK！");
+
+		return dataList;
+	}
+
+	private ABUiRowDataCurrentProDC getTermEndDCByReplenishData(HashVO vo)
+			throws Exception {
+		ABUiRowDataCurrentProDC data = new ABUiRowDataCurrentProDC();
+		data.setId(vo.getStringValue("ID"));
+		data.setParentId(vo.getStringValue("DCID"));
+
+		data.setDcId(vo.getStringValue("DCID"));
+		data.setDcCode(vo.getStringValue("DCCODE"));
+		data.setDcName(vo.getStringValue("DCNAME"));
+
+		data.setProId(vo.getStringValue("PRODUCTID"));
+		data.setProCode(vo.getStringValue("PCODE"));
+		data.setProName(vo.getStringValue("PNAME"));
+		data.setUnitGroupName(vo.getStringValue("UNITGROUPNAME"));
+		data.setUnitName(vo.getStringValue("UNITNAME"));
+
+		String code = vo.getStringValue("ENDINV_CODE");
+		data.setTermEndName(termEndService.getMetaEndingInvertory(code)!= null ?
+				termEndService.getMetaEndingInvertory(code).getName():StringUtils.EMPTY);
+		data.setTermEndCode(code);
+		data.setPeriod(vo.getStringValue("TERM_END_PERIOD"));
+		data.setTermEndValue(vo.getStringValue("TERM_END_VALUE"));
+
+		return data;
+	}
+
+	public List<ABUiRowDataCurrentProDC> getReplenishDataByPeriod(
+			List<String> pidList, List<String> dcidList, int period)
+			throws Exception {
+
+		HashMap<String, ABUiRowDataCurrentProDC> dataIndex = new HashMap<String, ABUiRowDataCurrentProDC>();
+		HashMap<String, ABUiRowDataCurrentProDC> dcIndex = new HashMap<String, ABUiRowDataCurrentProDC>();
+
+		String dcids = getQueryIds(dcidList);
+		String pids = getQueryIds(pidList);
+
+		StringBuilder sb = new StringBuilder();
+		// tree sql
+		sb.append(" ;with sub_distribute as ( ");
+		sb.append(" select * from distributioncenter where id in (" + dcids
+				+ ") union all ");
+		sb.append(" select d.* from distributioncenter d inner join sub_distribute t on ( d.PARENTDCID = t.id )), ");
+		sb.append(" sub_product as ( select * from PRODUCT where id in ("
+				+ pids + ") union all");
+		sb.append(" select d.* from PRODUCT d inner join sub_product t on ( d.PARENTPRODUCTID = t.id ))");
+		sb.append(" SELECT 'RD'+cast(RD.ID as nvarchar) ID,RD.DCID,DC.CODE DCCODE,DC.NAME DCNAME,");
+		sb.append(" (SELECT NAME FROM UNITGROUP UG WHERE UG.ID=P.UNITGROUPID ) UNITGROUPNAME,");// 单位、单位组
+		sb.append(" (SELECT NAME FROM UNIT UN WHERE UN.ID=P.UNITID) UNITNAME,");
+		sb.append("  RD.PRODUCTID,P.CODE PCODE,P.NAME PNAME,");
+		sb.append(" RD.SELLIN,RD.SELLOUT,RD.TERMBEGIN,RD.TERMEND,RD.STOCKDAY,RD.UPDATETIME,CONVERT(varchar(100),RD.UPDATETIME, 120) COMPUTETIME,");
+
+		sb.append(" RD.COMMENTS");
+		sb.append(" FROM REPLENISHDATA RD,PRODUCT P,DISTRIBUTIONCENTER DC ");
+		sb.append(" WHERE P.ID=RD.PRODUCTID AND DC.ID=RD.DCID AND RD.PERIOD="
+				+ period + ""); // 从当前期间开始查询
+		sb.append(" AND RD.DCID IN ( select id from sub_distribute ) "); // 产品条件
+		sb.append(" AND P.ID IN ( select id from sub_product ) "); // DC条件
+		sb.append(" ORDER BY DCLAYER,DCNAME,PCODE");
+
+		// 可以根据条件选择是否要形成树级结构
+
+		HashVO[] dataVos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				sb.toString());
+
+		StringBuilder dcsb = new StringBuilder();
+		dcsb.append(" with sub_distribute as ( select * from distributioncenter where id in ("
+				+ dcids + ") ");
+		dcsb.append(" union all  select d.* from distributioncenter d inner join sub_distribute t on ( d.PARENTDCID = t.id ))");
+		dcsb.append(" SELECT DC.ID,DC.PARENTDCID,DC.NAME,DC.CODE,");
+		dcsb.append(" DC.DCLAYER ");
+		dcsb.append(" FROM DISTRIBUTIONCENTER DC");
+		dcsb.append(" WHERE 1=1");
+		dcsb.append(" AND DC.ID IN ( SELECT id from sub_distribute )");
+		dcsb.append(" ORDER BY DC.DCLAYER DESC");
+
+		// 查询DC数据表
+		HashVO[] dcVos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT,
+				dcsb.toString());
+
+		// 加入详细数据结果列
+		for (int i = 0; i < dataVos.length; i++) {
+			ABUiRowDataCurrentProDC rowData = getCurrentProDCByReplenishData(dataVos[i]);
+			dataIndex.put(rowData.getId(), rowData);
+		}
+
+		// add by zhangzy 由于hashtable的内部排序机制，dcIndex的内容不是排序好的数据，需要一个排序好的DC数据
+		ArrayList<ABUiRowDataCurrentProDC> dcList = new ArrayList<ABUiRowDataCurrentProDC>(
+				dcVos.length);// 排序的DC列表
+
+		// 加入虚拟上级结果
+		for (HashVO dcvo : dcVos) {
+			ABUiRowDataCurrentProDC rowData = getCurrentProDCByDC(dcvo);
+			dcIndex.put(rowData.getId(), rowData);
+			dcList.add(rowData);
+		}
+
+		List<ABUiRowDataCurrentProDC> dataList = generateCurrentProDCTreeList(
+				dataIndex, dcIndex, dcList);
+
+		logger.info("查询[" + period + "]期分仓补货数据OK！");
+
+		return dataList;
+	}
+
+	private List<ABUiRowDataCurrentProDC> generateCurrentProDCTreeList(
+			HashMap<String, ABUiRowDataCurrentProDC> dataIndex,
+			HashMap<String, ABUiRowDataCurrentProDC> dcIndex,
+			List<ABUiRowDataCurrentProDC> dcList) throws Exception {
+
+		ArrayList<ABUiRowDataCurrentProDC> dataList = new ArrayList<ABUiRowDataCurrentProDC>(
+				dcList.size());
+
+		/**
+		 * 根据数据对象、DC目录对象构造一个目录树，DC为目录，如果DC目录中有下级DC目录，则DC上再创建一个虚拟目录，包含DC及其下级目录。
+		 * 如北区下，包含西安、郑州库，则创建一个新的“北区”目录，其子级包含(北区、西安、郑州) dataIndex的数据直接挂靠到对应的dc目录下
+		 */
+
+		// 1,处理dataIndex数据挂靠
+		Iterator<String> it = dataIndex.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			ABUiRowDataCurrentProDC row = dataIndex.get(key);
+
+			String parentId = row.getParentId();
+			if (parentId == null || "".equals(parentId)) {
+				dataList.add(row);
+			} else {
+				ABUiRowDataCurrentProDC parent = dcIndex.get(parentId);
+				if (parent == null) {
+					// 非顶级DC,但是在当前数据中没有其父级DC,应该不存在
+					dataList.add(row);
+				} else {
+					parent.addChildVo(row);
+				}
+			}
+		}
+
+		HashMap<String, ABUiRowDataCurrentProDC> dcCataIndex = new HashMap<String, ABUiRowDataCurrentProDC>();
+		// 2,处理DC目录信息，根据需要再生成父级虚拟DC
+		for (int i = 0; i < dcList.size(); i++) { // !!!!注意，此处遍历DC一定是顺序便利的，按照层级由下向上遍历
+			ABUiRowDataCurrentProDC dcrow = dcIndex.get(dcList.get(i).getId());
+
+			String parentId = dcrow.getParentId();
+			if (parentId != null) {
+				ABUiRowDataCurrentProDC parentDc = dcIndex.get(parentId);
+				;// 父DC
+				ABUiRowDataCurrentProDC parentCata = dcCataIndex.get(cataPrefix
+						+ parentId); // 父DC的虚拟目录
+
+				// 非顶级DC,但是在当前数据中没有其父级DC的数据不处理
+				if (parentDc != null) {
+					// 父结构数据找到，要构造一个虚拟的父目录，其父目录与现在目录同级
+					if (parentCata == null) {
+						parentCata = new ABUiRowDataCurrentProDC();
+						parentCata.setId(cataPrefix + parentId);
+						parentCata.setDcCode(parentDc.getDcCode());
+						parentCata.setDcName(parentDc.getDcName());
+
+						String parentCateParentId = parentDc.getParentId();
+						if (parentCateParentId != null
+								&& parentCateParentId.indexOf(cataPrefix) < 0)
+							parentCateParentId = cataPrefix
+									+ parentCateParentId;
+
+						parentCata.setParentId(parentCateParentId);
+
+						dcCataIndex.put(parentCata.getId(), parentCata); // 添加虚拟目录
+
+						// parentDc.setParentId(parentCata.getId());//此处parent的属性被修改了，再遍历到Parent时，找到的对应是目录
+						parentCata.addChildVo(parentDc);
+					}
+				}
+
+				if (parentCata != null
+						&& dcCataIndex.get(cataPrefix + dcrow.getId()) == null) { // 最明细DC
+					dcrow.setParentId(parentCata.getId());
+					parentCata.addChildVo(dcrow);
+				}
+			}
+		}
+
+		// 3, 将虚拟DC的最上级加入列表
+		it = dcCataIndex.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			ABUiRowDataCurrentProDC catalogRow = dcCataIndex.get(key);
+
+			String parentId = catalogRow.getParentId();
+			if (parentId == null || "".equals(parentId)) {
+				dataList.add(catalogRow);
+			} else {
+				ABUiRowDataCurrentProDC parentCata = dcCataIndex.get(parentId);
+				if (parentCata == null
+						&& dcCataIndex.get(cataPrefix + parentId) == null) {
+					dataList.add(catalogRow);
+				} else {
+					parentCata.addChildVo(catalogRow);
+				}
+			}
+		}
+
+		// 4,加入DC目录加入列表，目的是处理是处理只有一层DC的情况
+		it = dcIndex.keySet().iterator();
+		while (it.hasNext()) {
+			String key = (String) it.next();
+			ABUiRowDataCurrentProDC dcrow = dcIndex.get(key);
+
+			String dcParentId = dcrow.getParentId();
+			if (dcParentId != null) { // 这里只处理非顶级DC
+				if (dcParentId.startsWith(cataPrefix)) {
+					dcParentId = cataPrefix + dcrow.getParentId();
+				}
+
+				ABUiRowDataCurrentProDC parentCataDC = dcCataIndex.get(dcrow
+						.getParentId());
+				if (parentCataDC == null) {
+					parentCataDC = dcCataIndex.get(cataPrefix + dcrow.getId());
+					if (parentCataDC == null)
+						dataList.add(dcrow); // 根据cata+id, 或者 id均找不到父节点的情况
+				}
+			}
+		}
+
+		return dataList;
+	}
+
+	/**
+	 * 获取查询条件IDs
+	 * 
+	 * @param dcids
+	 * @return
+	 */
+	private String getQueryIds(List<String> idList) {
+		StringBuilder sb = new StringBuilder("-1");
+		for (int i = 0; i < idList.size(); i++) {
+			sb.append("," + idList.get(i));
+		}
+
+		return sb.toString();
+	}
+
+}

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.OperatorUserFunPermission" 
+    table="OPERATORUSER_FUNPERMISSION"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="sequence">
+            <param name="sequence">S_OPERATORUSER_FUNPERMISSION</param>
+        </generator>
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+
+    <!-- Associations -->
+  
+    <!-- uni-directional many-to-one association to FunPermission -->
+    <many-to-one
+        name="funPermission"
+        class="dmdd.dmddjava.dataaccess.dataobject.FunPermission"
+    >
+        <column name="FUNPERMISSIONID" />
+    </many-to-one>
+    <!-- bi-directional many-to-one association to OperatorUser -->
+    <many-to-one
+        name="operatorUser"
+        class="dmdd.dmddjava.dataaccess.dataobject.OperatorUser"
+        not-null="true"
+    >
+        <column name="OPERATORUSERID" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

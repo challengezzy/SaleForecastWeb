@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.ForecastInst" 
+    table="FORECASTINST"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="sequence">
+            <param name="sequence">S_FORECASTINST</param>
+        </generator>
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="code"
+        type="java.lang.String"
+        column="CODE"
+        not-null="true"
+        unique="true"
+        length="255"
+    />
+    <property
+        name="name"
+        type="java.lang.String"
+        column="NAME"
+        not-null="true"
+        unique="true"
+        length="255"
+    />
+    <property
+        name="fcPeriodNum"
+        type="int"
+        column="FCPERIODNUM"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="nextFcPeriodNum"
+        type="int"
+        column="NEXTFCPERIODNUM"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="fzPeriodNum"
+        type="int"
+        column="FZPERIODNUM"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="nextFzPeriodNum"
+        type="int"
+        column="NEXTFZPERIODNUM"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="errorThreshold"
+        type="java.lang.Double"
+        column="ERRORTHRESHOLD"
+        length="18"
+    />
+    <property
+        name="isValid"
+        type="int"
+        column="ISVALID"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="nextIsValid"
+        type="int"
+        column="NEXTISVALID"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="isRunned"
+        type="int"
+        column="ISRUNNED"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="mappingFcModelRunTime"
+        type="java.sql.Timestamp"
+        column="MAPPINGFCMODELRUNTIME"
+        length="7"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+    <property
+        name="distributeRefFormula"
+        type="int"
+        column="DISTRIBUTEREFFORMULA"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="decomposeFormula"
+        type="int"
+        column="DECOMPOSEFORMULA"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="distributeRefPeriodNum"
+        type="int"
+        column="DISTRIBUTEREFPERIODNUM"
+        not-null="true"
+        length="4"
+    />
+
+    <!-- Associations -->
+  
+    <!-- uni-directional many-to-one association to ProductLayer -->
+    <many-to-one
+        name="runProductLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.ProductLayer"
+    >
+        <column name="RUNPRODUCTLAYERID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to Bizdata -->
+    <many-to-one
+        name="finalFcBizData"
+        class="dmdd.dmddjava.dataaccess.dataobject.BizData"
+    >
+        <column name="FINALFCBIZDATAID" />
+    </many-to-one>    
+    <!-- uni-directional many-to-one association to BizData -->
+    <many-to-one
+        name="nextFinalFcBizData"
+        class="dmdd.dmddjava.dataaccess.dataobject.BizData"
+    >
+        <column name="NEXTFINALFCBIZDATAID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to BizData -->
+    <many-to-one
+        name="distributeRefBizData"
+        class="dmdd.dmddjava.dataaccess.dataobject.BizData"
+    >
+        <column name="DISTRIBUTEREFBIZDATAID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to ForecastModelM -->
+    <many-to-one
+        name="mappingFcModel"
+        class="dmdd.dmddjava.dataaccess.dataobject.ForecastModelM"
+        lazy="false"
+    >
+        <column name="MAPPINGFCMODELID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to OrganizationLayer -->
+    <many-to-one
+        name="runOrganizationLayer"
+        class="dmdd.dmddjava.dataaccess.dataobject.OrganizationLayer"
+    >
+        <column name="RUNORGANIZATIONLAYERID" />
+    </many-to-one>
+    <!-- bi-directional one-to-many association to ForecastInstNextProOrg -->
+    <set
+        name="forecastInstNextProOrgs"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="FORECASTINSTID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.ForecastInstNextProOrg"
+        />
+    </set>    
+    <!-- bi-directional one-to-many association to ForecastInstProOrg -->
+    <set
+        name="forecastInstProOrgs"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="FORECASTINSTID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.ForecastInstProOrg"
+        />
+    </set>
+
+</class>
+</hibernate-mapping>

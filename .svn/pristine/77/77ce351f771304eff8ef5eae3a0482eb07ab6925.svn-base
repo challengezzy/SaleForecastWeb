@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<params>
+		<init-param key="PROJECT_NAME" value="dmddweb" descr="项目名称" />
+		<init-param key="log4jfile" value="Log4j.properties" descr="日志属性文件" />
+		<init-param key="DS_PRINTSQL" value="true" descr="是否输出SQL语句"></init-param>
+		<!-- AD认证配置 Begin -->
+		<init-param key="isOpenAD" value="false" descr="是否验证AD，如果为false则直接以正常状态打开客户端" />
+		<init-param key="ADAddress" value="134.127.17.22" descr="ad服务器地址" />
+		<init-param key="ADPort" value="389" descr="AD链接端口，默认是389，一般不需要改动 " />
+		<init-param key="ADDomain" value="" descr="AD用户名后缀名，一般为@XX.com，也有特殊的，这个主要取决于AD服务器配置,根据实际情况而不同." />
+		<init-param key="beforeHead" value="npz\\" descr="" />
+		<!-- AD认证配置 End -->
+		
+		<!-- 系统版本 Begin -->
+		<init-param key="version_server" value="v3.0" descr="服务端版本，补丁号" />
+		<init-param key="version_database" value="v3.0" descr="数据库补丁号" />
+		<!-- 系统版本 End -->
+		
+		<init-param key="MPOP" value="true" descr="是否允许用户多点登录 multiple points of presence" />
+		<init-param key="IsImportDetail" value="TRUE" descr="判断用户业务范围是否导入明细" />
+		<init-param key="database_type" value="sqlserver" descr="数据库类型,取值类型'oracle','sqlserver','db2' " />
+		<init-param key="isSuitSupport" value="true" descr="是否支持套装， 取值类型‘true’,‘false’ " />
+		<init-param key="initSuit" value="false" descr="是否初始化折合业务数据和数据值， 取值类型‘true’，‘false’, true时为业务数据创建折合数据" />
+		<init-param key="decimalLength" value="2" descr="保留的小数位长度" />
+	</params>
+	
+	
+	<datasources>
+	    
+		<datasource name="datasource_default">
+			<driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</driver>
+			<url>jdbc:sqlserver://61.129.57.232:1433;DatabaseName=dmprod20180208;User=ruxin;Password=ruxin;</url>
+			<initsize>2</initsize>
+			<poolsize>300</poolsize>
+			<validationQuery>SELECT TOP(1) 1 FROM OPERATORUSER</validationQuery> 
+		</datasource>
+		 
+		 <!--<datasource name="datasource_default">
+			<driver>oracle.jdbc.driver.OracleDriver</driver>
+			<url>jdbc:oracle:thin:dmdd_cndemo/dmdd_cndemo@121.197.15.177:1521:ORCL</url>
+			<initsize>2</initsize>
+			<poolsize>50</poolsize>
+			<validationQuery>select 1 from dual</validationQuery> 
+		</datasource>
+	-->
+	</datasources>
+	<log4j>
+		<logpath>c:/log/coollog/</logpath>
+		<rootlevel>debug</rootlevel>
+		<!--  日志输出方式，1-控制台输入 2-文件输出 3-控制台+文件输出  -->
+		<outputtype>3</outputtype>
+		<classlevels>
+			<loglevel clspath="com" level="debug" />
+			<loglevel clspath="dmdd" level="debug" />
+			<loglevel clspath="org.hibernate" level="info" desc="hibernate日志"/>
+			<loglevel clspath="org.hibernate.SQL" level="info" desc="sql语句"/>
+			<loglevel clspath="org.hibernate.type" level="info" desc="JDBC bind parameters"/>
+			<loglevel clspath="org.hibernate.cache" level="info" desc="cache activity"/>
+			<loglevel clspath="org.hibernate.hql" level="info" desc="HQL parse trees" />
+			<loglevel clspath="org.hibernate.jdbc" level="info" desc="JDBC resource acquisition" />
+			<loglevel clspath="org.hibernate.transaction" level="info" desc="事务"/>
+			<loglevel clspath="org.hibernate.tool.hbm2ddl" level="info" desc="schema export/update"/>
+		</classlevels>
+	</log4j>
+</root>

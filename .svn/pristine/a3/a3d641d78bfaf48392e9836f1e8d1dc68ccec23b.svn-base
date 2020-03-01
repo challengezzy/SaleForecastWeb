@@ -1,0 +1,183 @@
+<menutree>
+	<menuitem iscatalog="Y" code="mainDataManage" namecn="主数据管理" nameen="Master Data" shortcut="N" icon="">
+		<menuitem iscatalog="N" code="measureUnit" namecn="计量单位" nameen="UOM" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/unit/Mod_Maindata_Unit.swf" />
+
+		<menuitem iscatalog="Y" code="product" namecn="产品" nameen="Product" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/product/Mod_Maindata_Product.swf">
+			<menuitem iscatalog="N" code="pro_Maintain" namecn="产品维护" nameen="Product" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/product/Mod_Maindata_Product_Product.swf" />
+			<menuitem iscatalog="N" code="pro_CharMaintain" namecn="产品特征维护" nameen="Product Chara" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/product/Mod_Maindata_Product_ProductCharacter.swf" />
+			<menuitem iscatalog="N" code="pro_LayerMaintain" namecn="产品层次维护" nameen="Product Level" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/product/Mod_Maindata_Product_ProductLayer.swf" />
+			<menuitem iscatalog="N" code="pro_CharLayerMaintain" namecn="产品特征层次维护" nameen="Product Chara Level" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/product/Mod_Maindata_Product_ProductCharacterLayer.swf" />
+			<menuitem iscatalog="N" code="pro_Imp" namecn="套装导入" nameen="Import Product" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/product/Mod_Maindata_Product_Product_Import.swf" />
+			<menuitem iscatalog="N" code="pro_CharImp" namecn="产品特征导入" nameen="Import Product Chara" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/product/Mod_Maindata_Product_ProductCharacter_Import.swf" />
+			<menuitem iscatalog="N" code="pro_NproCharImp" namecn="产品-产品特征导入" nameen="Import Product-ProductChara" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/product/Mod_Maindata_Product_ProductProCharacter_Import.swf" />
+			
+			<menuitem iscatalog="N" code="pro_report" namecn="产品主数据" nameen="Product Data" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/Mod_Maindata_Product_Report.swf" />
+			<menuitem iscatalog="N" code="pro_productkit" namecn="产品套装" nameen="Product KIT" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/Mod_Maindata_ProductSuit_Report.swf" />
+		</menuitem>
+
+		<menuitem iscatalog="Y" code="salesOrg" namecn="销售组织" nameen="Sales Org" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/organization/Mod_Maindata_Organization.swf">
+			<menuitem iscatalog="N" code="org_Maintain" namecn="组织维护" nameen="SalesOrg" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/organization/Mod_Maindata_Organization_Organization.swf" />
+			<menuitem iscatalog="N" code="org_CharMaintain" namecn="组织特征维护" nameen="SalesOrg Chara" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/organization/Mod_Maindata_Organization_OrganizationCharacter.swf" />
+			<menuitem iscatalog="N" code="org_LayerMaintain" namecn="组织层次维护" nameen="SalesOrg Level" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/organization/Mod_Maindata_Organization_OrganizationLayer.swf" />
+			<menuitem iscatalog="N" code="org_CharLayerMaintain" namecn="组织特征层次维护" nameen="SalesOrg Chara Level" shortcut="N" icon=""
+				url="dmdd/dmddmx/mod/maindata/organization/Mod_Maindata_Organization_OrganizationCharacterLayer.swf" />
+			<menuitem iscatalog="N" code="org_Imp" namecn="组织导入" nameen="Import SalesOrg" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/organization/Mod_Maindata_Organization_Organization_Import.swf" />
+			<menuitem iscatalog="N" code="org_CharImp" namecn="组织特征导入" nameen="Import SalesOrg Chara" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/organization/Mod_Maindata_Organization_OrganizationCharacter_Import.swf" />
+			<menuitem iscatalog="N" code="org_NorgCharImp" namecn="组织-组织特征导入" nameen="Import SalesOrg-OrgChara" shortcut="N" icon=""
+				url="dmdd/dmddmx/mod/maindata/organization/Mod_Maindata_Organization_OrganizationOrgCharacter_Import.swf" />
+		</menuitem>
+
+		<menuitem iscatalog="Y" code="distributionCentre" namecn="分销中心" nameen="DC" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/distributioncenter/Mod_Maindata_DC.swf">
+			<menuitem iscatalog="N" code="dc_manager" namecn="分销中心管理" nameen="DC Mgmt" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/distributioncenter/Mod_Maindata_DC_DCManager.swf" />
+			<menuitem iscatalog="N" code="dc_import" namecn="分销中心导入" nameen="DC Import" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/distributioncenter/Mod_Maindata_DC_DCImport.swf" />
+		</menuitem>
+		<menuitem iscatalog="Y" code="busData" namecn="业务数据" nameen="Key Figure" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData.swf">
+			<menuitem iscatalog="N" code="bizdata_sysPreDefinition" namecn="系统预定义" nameen="System Pre-defined" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataSysDef.swf" />
+			<menuitem iscatalog="N" code="bizdata_historyCleanReason" namecn="事件类型" nameen="Event Type" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataHisAdR.swf" />
+			<menuitem iscatalog="N" code="bizdata_judgeForecast" namecn="判断预测" nameen="Judgemental Forecast" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataFcHand.swf" />
+			<menuitem iscatalog="N" code="bizdata_combineForecast" namecn="组合预测" nameen="Weighted Forecast" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataFcComb.swf" />
+			<menuitem iscatalog="N" code="bizdata_corresponHistory" namecn="同期历史" nameen="Corresponding History" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataTimeHis.swf" />
+			<menuitem iscatalog="N" code="bizdata_corresponForecast" namecn="同期预测" nameen="Corresponding Forecast" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataTimeFc.swf" />
+			<menuitem iscatalog="N" code="bizdata_acountData" namecn="金额数据" nameen="Amount" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataMoney.swf" />
+			<menuitem iscatalog="N" code="bizdata_combineAccountData" namecn="组合金额预测" nameen="Weighted Amount" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataMoneyComb.swf" />
+			<menuitem iscatalog="N" code="bizdata_kpi" namecn="KPI" nameen="KPI" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataKpi.swf" />
+			<menuitem iscatalog="N" code="bizdata_versionForecast" namecn="版本预测" nameen="Version Forecast" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_ForecastAssessment.swf" />
+			<menuitem iscatalog="N" code="bizdata_avgHistory" namecn="历史平均" nameen="AVG History" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataAvgHis.swf" />
+			<menuitem iscatalog="N" code="bizdata_accForecast" namecn="预测累积" nameen="YTD Forecast" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataAddFc.swf" />
+			<menuitem iscatalog="N" code="bizdata_accHistory" namecn="历史累积" nameen="YTD History" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataAddHis.swf" />
+			<menuitem iscatalog="N" code="bizdata_periodVersion" namecn="M-N版本预测" nameen="PERIOD VERSION" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/bizdata/Mod_Maindata_BizData_BizDataPeriodVersion.swf" />
+		</menuitem>
+
+		<menuitem iscatalog="N" code="forecastModel" namecn="预测模型" nameen="Forecast Model" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastModelM.swf" />
+		<menuitem iscatalog="N" code="forecastStrategy" namecn="预测策略" nameen="Forecast Strategy" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastInst.swf" />
+		
+		<menuitem iscatalog="N" code="pro_fcproduct_query" namecn="预测策略查询" nameen="Forecast Strategy Query" shortcut="N" icon="" url="dmdd/dmddmx/mod/maindata/Mod_Maindata_ForecastProduct_Report.swf" />
+	</menuitem>
+	
+	<menuitem iscatalog="Y" code="forecastManage" namecn="预测管理" nameen="Forecast Mgmt" shortcut="N" icon="">
+		<menuitem iscatalog="N" code="fc_forecastQuery" namecn="预测查询" nameen="Forecast Query" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastData_Query.swf" />
+		<menuitem iscatalog="N" code="fc_quickForecast" namecn="快速预测" nameen="Quick Forecast" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastData_ForecastHandQuick.swf" />
+		<menuitem iscatalog="N" code="fc_collaForecast" namecn="协同预测" nameen="Collaborative Forecast" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastData_ForecastHand.swf" />
+		<menuitem iscatalog="N" code="fc_forecastRelease" namecn="预测审核" nameen="Forecast Release" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastData_Audit.swf" />
+		<menuitem iscatalog="N" code="fc_fcdataimport" namecn="预测导入" nameen="Forecast Import" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastData_ForecastHandQuick.swf" />
+		<menuitem iscatalog="Y" code="fc_statisticForecast" namecn="统计预测" nameen="Statistic Forecast" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastData_ForecastModel.swf">
+			<menuitem iscatalog="N" code="newStatisTask" namecn="新建预测运行任务" nameen="New Statistic Running Task" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastData_ForecastModel_Create.swf" />
+			<menuitem iscatalog="N" code="lastestStatisTask" namecn="最近预测运行任务" nameen="Lastest Statistic Running Task" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastData_ForecastModel_Latest.swf" />
+			<menuitem iscatalog="N" code="queryStatisTask" namecn="查询预测运行任务" nameen="Query Statistic Running Task" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastData_ForecastModel_Query.swf" />
+		</menuitem>
+		<menuitem iscatalog="N" code="fc_periodRolling" namecn="期间滚动" nameen="Period Rolling" shortcut="N" icon="" url="dmdd/dmddmx/mod/system/Mod_System_SysPeriod.swf" />
+		<menuitem iscatalog="N" code="fc_logQuery" namecn="日志查询" nameen="Changes History" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastMakeLog_Query.swf" />
+		<menuitem iscatalog="N" code="fc_errorAnalysis" namecn="误差分析" nameen="Error Analysis" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastErrorMappingModel_Query.swf" />
+		<menuitem iscatalog="N" code="fc_versionForecast" namecn="版本预测" nameen="Version Forecast" shortcut="N" icon="" url="dmdd/dmddmx/mod/forecast/Mod_Forecast_ForecastAssessment_Create_Manu.swf" />
+	</menuitem>
+	
+	<menuitem iscatalog="Y" code="sop" namecn="S&amp;OP" nameen="S&amp;OP" shortcut="N" icon="">
+		<menuitem iscatalog="N" code="S&amp;OP" namecn="S&amp;OP" nameen="S&amp;OP" shortcut="N" icon="" url="dmdd/dmddmx/mod/sop/Mod_Sop_SopHand.swf" />
+	</menuitem>
+	
+	<menuitem iscatalog="Y" code="historyManage" namecn="历史管理" nameen="History Mgmt" shortcut="N" icon="">
+		<menuitem iscatalog="N" code="hs_Query" namecn="历史查询" nameen="History Query" shortcut="N" icon="" url="dmdd/dmddmx/mod/history/Mod_History_HistoryData_Query.swf" />
+		<menuitem iscatalog="N" code="hs_Clean" namecn="事件管理" nameen="Event Mgmt" shortcut="N" icon="" url="dmdd/dmddmx/mod/history/Mod_History_HistoryData_Adjust.swf" />
+		<menuitem iscatalog="N" code="hs_Imp" namecn="历史导入" nameen="History Import" shortcut="N" icon="" url="dmdd/dmddmx/mod/history/Mod_History_HistoryData_Import.swf" />
+		<menuitem iscatalog="N" code="hs_cleanedHistoryImp" namecn="事件导入" nameen="Event Import" shortcut="N" icon="" url="dmdd/dmddmx/mod/history/Mod_History_HistoryDataADR_Import.swf" />
+		<menuitem iscatalog="N" code="hs_LogQuery" namecn="历史修正日志查询" nameen="Changes History" shortcut="N" icon="" url="dmdd/dmddmx/mod/history/Mod_History_HistoryAdjustLog_Query.swf" />
+	</menuitem>
+	
+	<menuitem iscatalog="Y" code="reportCentre" namecn="报表中心" nameen="Report" shortcut="N" icon="">
+		<menuitem iscatalog="N" code="report_row" namecn="横向报表" nameen="Row Based Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/report/Mod_Report_Row.swf" />
+		<menuitem iscatalog="N" code="report_column" namecn="纵向报表" nameen="Column Based Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/report/Mod_Report_Column.swf" />
+		<menuitem iscatalog="N" code="report_weight" namecn="权重报表" nameen="Weighted KPI Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/report/Mod_Report_Weight.swf" />
+		<menuitem iscatalog="N" code="report_statistics" namecn="汇总报表" nameen="Consolidation Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/report/Mod_Report_Statistics.swf" />
+		<menuitem iscatalog="N" code="report_breakdown" namecn="分解报表" nameen="Distribution Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/report/Mod_Report_BreakDown.swf" />
+		<menuitem iscatalog="N" code="report_expansion" namecn="分层报表" nameen="Master-Detail Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/report/Mod_Report_Expansion.swf" />
+		<menuitem iscatalog="N" code="report_historyforecast" namecn="历史预测报表" nameen="History-Forecast Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/report/Mod_Report_HistoryForecast.swf" />
+		<menuitem iscatalog="Y" code="conversion" namecn="多单位换算管理" nameen="Multi UOM Mgmt" shortcut="N" icon="">
+			<menuitem iscatalog="N" code="cv_type_manage" namecn="换算类型管理" nameen="Conversion Mgmt" shortcut="N" icon="" url="dmdd/dmddmx/mod/conversion/Mod_Conversion_ConversionType_Manage.swf" />
+			<menuitem iscatalog="N" code="cv_set_audit" namecn="换算配置管理" nameen="Conversion Setting" shortcut="N" icon="" url="dmdd/dmddmx/mod/conversion/Mod_Conversion_ConversionSet_Audit.swf" />
+			<menuitem iscatalog="N" code="cv_set_import" namecn="换算比例导入" nameen="Conversion Rate Import" shortcut="N" icon="" url="dmdd/dmddmx/mod/conversion/Mod_Conversion_ConversionSet_Import.swf" />
+			<menuitem iscatalog="N" code="cv_report" namecn="多单位换算报表" nameen="MultiUom Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/conversion/Mod_Conversion_ConversionReport.swf" />
+		</menuitem>
+	</menuitem>
+	<menuitem iscatalog="Y" code="inventory" namecn="库存风险预警" nameen="Inventory" shortcut="N" icon="">
+		<menuitem iscatalog="N" code="zlife_import" namecn="期初库存导入" nameen="Import ZLife" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_Zlife_Import.swf" />
+		<menuitem iscatalog="N" code="popr_import" namecn="生产订单导入" nameen="Import POPR" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_Popr_Import.swf" />
+		
+		<!-- 
+		<menuitem iscatalog="N" code="mtd_import" namecn="当月交货导入" nameen="Import MTD" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_Mtd_Import.swf" />
+		<menuitem iscatalog="N" code="mtd_inquery" namecn="当月交货导入查询" nameen="MTD IN QUERY" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_Mtd_InQuery.swf" />
+		 -->
+		<menuitem iscatalog="N" code="zlife_inquery" namecn="期初库存查询" nameen="ZLIFE IN QUERY" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_Zlife_InQuery.swf" />
+		<menuitem iscatalog="N" code="popr_inquery" namecn="生产订单查询" nameen="POPR IN QUERY" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_Popr_InQuery.swf" />
+		
+		<menuitem iscatalog="N" code="stock_query" namecn="期初库存计算" nameen="ZLIFE QUERY" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_Stock_Query.swf" />
+		<menuitem iscatalog="N" code="popr_query" namecn="生产订单计算" nameen="POPR QUERY" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_Popr_Query.swf" />
+		
+		<!-- 
+		<menuitem iscatalog="N" code="overstock_risk" namecn="OverStock风险报表" nameen="OVERSTOCK RISK" shortcut="N" icon="" url="dmdd/dmddmx/mod/invreport/Mod_InvReport_OverStockRisk.swf" />
+		<menuitem iscatalog="N" code="overstock_risksummary" namecn="OverStock风险汇总报表" nameen="OVERSTOCK RISK SUMMARY" shortcut="N" icon="" url="dmdd/dmddmx/mod/invreport/Mod_InvReport_OverStockRiskSummary.swf" />
+		<menuitem iscatalog="N" code="iventory_covermonths" namecn="缺货风险评估报表" nameen="INVENTORY COVERMONTHS" shortcut="N" icon="" url="dmdd/dmddmx/mod/invreport/Mod_InvReport_ConverMonths.swf" />
+		<menuitem iscatalog="N" code="iventory_covermonths_summary" namecn="缺货风险评估汇总报表" nameen="INVENTORY COVERMONTHS SUMMARY" shortcut="N" icon="" url="dmdd/dmddmx/mod/invreport/Mod_InvReport_ConverMonthsSummary.swf" />
+		 -->
+		 <menuitem iscatalog="N" code="safestock_import" namecn="安全库存导入" nameen="SAFE STOCK IMPORT" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_SafeStock_Import.swf" />
+		 <menuitem iscatalog="N" code="safestock_query" namecn="安全库存查询" nameen="SAFE STOCK QUERY" shortcut="N" icon="" url="dmdd/dmddmx/mod/inventory/Mod_Inventory_SafeStock_Query.swf" />
+		<menuitem iscatalog="N" code="inventory_risk_report" namecn="库存风险预警明细报表" nameen="INVENTORY RISK" shortcut="N" icon="" url="dmdd/dmddmx/mod/invreport/Mod_InvReport_InventoryRisk.swf" />
+		<menuitem iscatalog="N" code="inventory_risk_report_summary" namecn="库存风险预警汇总报表" nameen="INVENTORY RISK SUMMARY" shortcut="N" icon="" url="dmdd/dmddmx/mod/invreport/Mod_InvReport_InventoryRisk_Summary.swf" />
+		
+		<menuitem iscatalog="N" code="forecast_inventory" namecn="销售风险预警报表" nameen="FORECAST INVENTORY" shortcut="N" icon="" url="dmdd/dmddmx/mod/invreport/Mod_InvReport_ForecastInventory.swf" />
+	</menuitem>
+	
+	<menuitem iscatalog="Y" code="priceManage" namecn="价格管理" nameen="Price Mgmt" shortcut="N" icon="">
+
+		<menuitem iscatalog="N" code="price_Query" namecn="价格查询" nameen="Price Query" shortcut="N" icon="" url="dmdd/dmddmx/mod/price/Mod_Price_PriceData_Query.swf" />
+		<menuitem iscatalog="N" code="price_Maintain" namecn="价格维护" nameen="Price Maintenance" shortcut="N" icon="" url="dmdd/dmddmx/mod/price/Mod_Price_PriceData_Adjust.swf" />
+		<menuitem iscatalog="N" code="price_Imp" namecn="价格导入" nameen="Price Import" shortcut="N" icon="" url="dmdd/dmddmx/mod/price/Mod_Price_PriceData_Import.swf" />
+	</menuitem>
+
+	<menuitem iscatalog="Y" code="rp_Manage" namecn="补货管理" nameen="Replenish" shortcut="N" icon="">
+		<menuitem iscatalog="N" code="rp_current" namecn="单期补货" nameen="One period Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/replenish/Mod_Replenish_Query_Current.swf" />
+		<menuitem iscatalog="N" code="rp_report" namecn="多期补货" nameen="MultiPeriod Report" shortcut="N" icon="" url="dmdd/dmddmx/mod/replenish/Mod_Replenish_Report.swf" />
+		<menuitem iscatalog="N" code="rp_termend_import" namecn="期末库存导入" nameen="Import ClosingInv." shortcut="N" icon="" url="dmdd/dmddmx/mod/replenish/Mod_Replenish_Import_TermEnd.swf" />
+		<menuitem iscatalog="N" code="rp_stockdays_import" namecn="库存天数导入" nameen="Import DOS" shortcut="N" icon="" url="dmdd/dmddmx/mod/replenish/Mod_Replenish_Import_StockDays.swf" />
+		<menuitem iscatalog="N" code="rp_recompute" namecn="补货数据计算" nameen="Re-calculate" shortcut="N" icon="" url="dmdd/dmddmx/mod/replenish/Mod_Replenish_ReCompute.swf" />
+		<menuitem iscatalog="N" code="rp_history_report" namecn="补货历史查询" nameen="Replenish History" shortcut="N" icon="" url="dmdd/dmddmx/mod/replenish/Mod_Replenish_History_Report.swf" />
+
+	</menuitem>
+
+	<menuitem iscatalog="Y" code="securityManage" namecn="用户管理" nameen="User Mgmt" shortcut="N" icon="">
+		<menuitem iscatalog="N" code="user_Manage" namecn="用户管理" nameen="User Mgmt" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_OperatorUser.swf" />
+		<menuitem iscatalog="N" code="user_changePsw" namecn="修改密码" nameen="Change Password" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_ChangePassword.swf" />
+		<menuitem iscatalog="N" code="user_BusScopeImp" namecn="用户业务范围导入" nameen="User Scope Import" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Securty_OperatorUserProOrg_Import.swf" />
+	</menuitem>
+	
+	<menuitem iscatalog="Y" code="sysManage" namecn="系统管理" nameen="System" shortcut="N" icon="">
+		<menuitem iscatalog="N" code="workIndex" namecn="主页" nameen="HOME" shortcut="N" icon="" url="dmdd/dmddmx/mod/homepage/Mod_Homepage.swf" />
+		<menuitem iscatalog="N" code="announcementManage" namecn="公告管理" nameen="Bulletin" shortcut="N" icon="" url="dmdd/dmddmx/mod/bulletin/Mod_Bulletin.swf" />
+		<menuitem iscatalog="N" code="metadataManage" namecn="元数据管理" nameen="MetaData" shortcut="N" icon="" url="dmdd/dmddmx/mod/system/Mod_System_MetadataMng.swf" />
+		
+		<menuitem iscatalog="Y" code="dataClear" namecn="系统清除" nameen="Data Clear" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_SysBak.swf" >
+			<menuitem iscatalog="N" code="sysDataClear" namecn="系统数据清除" nameen="SysData Manual Clear" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_SysBak_Manual.swf" />
+			<menuitem iscatalog="N" code="dataClear" namecn="系统清除记录查询" nameen="Query Clearing Log" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_SysBak_Query.swf" />
+		</menuitem>
+		
+		<menuitem iscatalog="Y" code="standardInterfaceManage" namecn="标准接口管理" nameen="Standard Interface" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_Interface_Standard.swf">
+			<menuitem iscatalog="N" code="standardhistorydata" namecn="标准接口-历史数据类" nameen="Standard_HistoryData" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/standard/Mod_Security_Interface_Standard_HistoryData.swf" />
+			<menuitem iscatalog="N" code="standardhistorydataadr" namecn="标准接口-历史修正原因类" nameen="Standard_HistoryDataADR" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/standard/Mod_Security_Interface_Standard_HistoryDataADR.swf" />
+		</menuitem>
+		<menuitem iscatalog="Y" code="interfaceManage" namecn="SAP接口管理" nameen="Interface Mgmt" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_Interface.swf">
+			<menuitem iscatalog="N" code="interfaceproduct" namecn="SAP接口-产品" nameen="Interface_Product" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_Interface_Product.swf" />
+			<menuitem iscatalog="N" code="interfacesemifinishproduct" namecn="SAP接口-半成品" nameen="Interface_SemiFinishedProduct" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_Interface_SemiFinishedProduct.swf" />
+			<menuitem iscatalog="N" code="interfaceorganization" namecn="SAP接口-组织" nameen="Interface_Organization" shortcut="N" icon="" url="dmdd/dmddmx/mod/security/Mod_Security_Interface_Organization.swf" />
+			<menuitem iscatalog="N" code="interfaceoinvoiceweight" namecn="SAP接口-发票重量" nameen="Interface_HistoryData_InvoiceWeight" shortcut="N" icon=""
+				url="dmdd/dmddmx/mod/security/Mod_Security_Interface_HistoryData_InvoiceWeight.swf" />
+			<menuitem iscatalog="N" code="interfaceoinvoiceprice" namecn="SAP接口-发票收入" nameen="Interface_HistoryData_InvoicePrice" shortcut="N" icon=""
+				url="dmdd/dmddmx/mod/security/Mod_Security_Interface_HistoryData_InvoicePrice.swf" />
+		</menuitem>
+		
+		<menuitem iscatalog="Y" code="mobileServerManage" namecn="移动服务器端管理" nameen="Mobile Server" shortcut="N" icon="" url="dmdd/dmddmx/mod/mobile/Mod_Security_Mobile.swf" >
+			<menuitem iscatalog="N" code="mobileSiglePeriodQry" namecn="单期报表查询设置" nameen="单期报表查询设置" shortcut="N" icon="" url="dmdd/dmddmx/mod/mobile/Mod_Security_Mobile_Report_Single.swf" />
+			<menuitem iscatalog="N" code="mobileMultiPeriodQry" namecn="多期报表查询设置" nameen="多期报表查询设置" shortcut="N" icon="" url="dmdd/dmddmx/mod/mobile/Mod_Security_Mobile_Report_Multi.swf" />
+			<menuitem iscatalog="N" code="mobileForecastEdit" namecn="预测编制设置" nameen="预测编制设置" shortcut="N" icon="" url="dmdd/dmddmx/mod/mobile/Mod_Security_Mobile_Forecast.swf" />
+		</menuitem>
+		
+	</menuitem>
+</menutree>

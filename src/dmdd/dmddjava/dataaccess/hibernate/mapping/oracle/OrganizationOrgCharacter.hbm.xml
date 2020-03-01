@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.OrganizationOrgCharacter" 
+    table="ORGANIZATION_ORGCHARACTER"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="sequence">
+            <param name="sequence">S_ORGANIZATION_ORGCHARACTER</param>
+        </generator>
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to Organization -->
+    <many-to-one
+        name="organization"
+        class="dmdd.dmddjava.dataaccess.dataobject.Organization"
+        not-null="true"
+    >
+        <column name="ORGANIZATIONID" />
+    </many-to-one>
+    <!-- bi-directional many-to-one association to OrganizationCharacter -->
+    <many-to-one
+        name="organizationCharacter"
+        class="dmdd.dmddjava.dataaccess.dataobject.OrganizationCharacter"
+        not-null="true"
+    >
+        <column name="ORGANIZATIONCHARACTERID" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

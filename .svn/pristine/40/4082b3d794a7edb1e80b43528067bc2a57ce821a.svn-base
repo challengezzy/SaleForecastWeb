@@ -1,0 +1,322 @@
+package dmdd.dmddjava.service.invreport;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import com.cool.common.constant.DMOConst;
+import com.cool.common.logging.CoolLogger;
+import com.cool.common.vo.HashVO;
+import com.cool.dbaccess.CommDMO;
+
+import dmdd.dmddjava.common.utils.UtilPeriod;
+import dmdd.dmddjava.dataaccess.aidobject.ABUiRowData;
+import dmdd.dmddjava.dataaccess.bizobject.BBizData;
+import dmdd.dmddjava.dataaccess.bizobject.BProduct;
+
+/**
+ * 查询基本信息的接口
+ * <p>Title: </p>
+ * <p>Description: </p>
+ * <p>Company: dmdd</p> 
+ * @author zzy
+ * @date Aug 13, 2017 6:37:10 PM
+ */
+public class OverStockRiskDao {
+	
+	protected CommDMO dmo = new CommDMO();
+	protected Logger logger = CoolLogger.getLogger(this.getClass());
+	
+	/**
+	 * 查询库存下架期数据
+	 * @param dataPeriod 数据期间
+	 * @param product
+	 * @param periodBegin
+	 * @param periodEnd
+	 * @param bizData
+	 * @return
+	 * @throws Exception
+	 */
+	public ABUiRowData getInvStockOffUiRowData(int dataPeriod,BProduct product,int periodBegin, int periodEnd, BBizData bizData ) throws Exception
+	{
+		//每个业务数据与abUiRowDataProOrg结合生成一条abUiRowDat
+		ABUiRowData abUiRowData = new ABUiRowData();
+		abUiRowData.setProduct( product );
+		abUiRowData.setBizData( bizData );
+		abUiRowData.setPeriodBegin( periodBegin );
+		abUiRowData.setPeriodEnd( periodEnd );
+		
+		//数据查询
+		String sql = "SELECT SUM(QUANTITY) VALUE,OFFSHELF_PERIOD FROM INV_STOCK_DATA " +
+				" WHERE PRODUCTID=? AND OFFSHELF_PERIOD>=? AND OFFSHELF_PERIOD<=? AND PERIOD=?  GROUP BY OFFSHELF_PERIOD";
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),periodBegin,periodEnd,dataPeriod);
+		for (int j = 0; j < vos.length; j++) {
+			HashVO vo = vos[j];
+			int periodLoc = UtilPeriod.getPeriodDifference(periodBegin, vo.getIntegerValue("OFFSHELF_PERIOD"));
+			abUiRowData.pubFun4setPeriodDataValue(periodLoc, vo.getDoubleValue("VALUE"));
+			abUiRowData.pubFun4setPeriodDataValueBak(periodLoc, vo.getDoubleValue("VALUE"));
+		}
+		
+		return abUiRowData;
+	}
+	
+	/**
+	 * 
+	 * @param product
+	 * @param periodBegin
+	 * @param periodEnd
+	 * @param bizData
+	 * @param periodField 期间字段(到货日/过期日)
+	 * @param poPrPa 标识是查询PO,PR,PA
+	 * @return
+	 * @throws Exception
+	 */
+	public ABUiRowData getPoPrUiRowData(int dataPeriod, BProduct product,int periodBegin, int periodEnd, BBizData bizData,String periodField,String poPrPa ) throws Exception
+	{
+		//每个业务数据与abUiRowDataProOrg结合生成一条abUiRowDat
+		ABUiRowData abUiRowData = new ABUiRowData();
+		abUiRowData.setProduct( product );
+		abUiRowData.setBizData( bizData );
+		abUiRowData.setPeriodBegin( periodBegin );
+		abUiRowData.setPeriodEnd( periodEnd );
+		
+		//数据查询
+		String sql = "SELECT SUM(QUANTITY) VALUE,"+periodField+" FROM popr_data " +
+				" WHERE ORDERTYPE='"+poPrPa+"' AND PRODUCTID=? AND PERIOD=? AND "+ periodField +">=? AND "+ periodField +"<=? GROUP BY "+periodField;
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),dataPeriod,periodBegin,periodEnd);
+		for (int j = 0; j < vos.length; j++) {
+			HashVO vo = vos[j];
+			int periodLoc = UtilPeriod.getPeriodDifference(periodBegin, vo.getIntegerValue(periodField));
+			abUiRowData.pubFun4setPeriodDataValue(periodLoc, vo.getDoubleValue("VALUE"));
+			abUiRowData.pubFun4setPeriodDataValueBak(periodLoc, vo.getDoubleValue("VALUE"));
+		}
+		
+		return abUiRowData;
+	}
+	
+	/**
+	 * 获取数据期间PO数据汇总
+	 * @param product
+	 * @param period 当前期间,数据的所属期间
+	 * @param popr
+	 * @return
+	 * @throws Exception
+	 */
+	public Double getPeriodPoTotalData(BProduct product,int period,String periodField,String popr) throws Exception{
+		Double poValue = 0d;
+		//数据查询
+		String sql = "SELECT SUM(QUANTITY) VALUE FROM popr_data " +
+				" WHERE ORDERTYPE='"+popr+"' AND PRODUCTID=? AND PERIOD=?";
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),period);
+		
+		if(vos.length > 0){
+			HashVO vo = vos[0];
+			poValue = vo.getDoubleValue("VALUE");
+		}
+		
+		if(poValue == null){
+			poValue = 0d;
+		}
+		
+		return poValue;
+	}
+	
+	//查询po采购订单收货数据
+	public ABUiRowData getPoUiRowData(int dataPeriod, BProduct product,int periodBegin, int periodEnd, BBizData bizData,String periodField ) throws Exception
+	{
+		return getPoPrUiRowData(dataPeriod ,product, periodBegin, periodEnd, bizData, periodField, "PO");
+	}
+	
+	//查询安全库存导入数据
+	public ABUiRowData getSSRowData(BProduct product,int periodBegin, int periodEnd, BBizData bizData) throws Exception
+	{
+		//每个业务数据与abUiRowDataProOrg结合生成一条abUiRowDat
+		ABUiRowData abUiRowData = new ABUiRowData();
+		abUiRowData.setProduct( product );
+		abUiRowData.setBizData( bizData );
+		abUiRowData.setPeriodBegin( periodBegin );
+		abUiRowData.setPeriodEnd( periodEnd );
+		
+		//数据查询
+		String sql = "SELECT SUM(QUANTITY) VALUE,PERIOD FROM in_safestock " +
+				" WHERE PRODUCTID=? AND PERIOD>=? AND PERIOD<=? GROUP BY PERIOD";
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),periodBegin,periodEnd);
+		for (int j = 0; j < vos.length; j++) {
+			HashVO vo = vos[j];
+			int periodLoc = UtilPeriod.getPeriodDifference(periodBegin, vo.getIntegerValue("PERIOD"));
+			abUiRowData.pubFun4setPeriodDataValue(periodLoc, vo.getDoubleValue("VALUE"));
+			abUiRowData.pubFun4setPeriodDataValueBak(periodLoc, vo.getDoubleValue("VALUE"));
+		}
+		
+		return abUiRowData;
+	}
+	
+	//查询当月到货数据和当月到货的下架期数据
+	public List<ABUiRowData> getMtdPoUiRowData(BProduct product,int periodBegin, int periodEnd) throws Exception
+	{
+		List<ABUiRowData> rstList = new ArrayList<ABUiRowData>();
+		
+		//每个业务数据与abUiRowDataProOrg结合生成一条abUiRowDat
+		BBizData mtdBizData = new BBizData();
+		mtdBizData.setName("当月PO交货");
+		ABUiRowData mtdRowData = new ABUiRowData();
+		mtdRowData.setProduct( product );
+		mtdRowData.setBizData( mtdBizData );
+		mtdRowData.setPeriodBegin( periodBegin );
+		mtdRowData.setPeriodEnd( periodEnd );
+		
+		//数据查询
+		String sql = "SELECT SUM(QUANTITY) VALUE,PERIOD FROM MTD_DATA WHERE PRODUCTID=? AND PERIOD=? GROUP BY PERIOD";
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),periodBegin);
+		Double mtdValue = 0d;
+		for (int j = 0; j < vos.length; j++) {
+			HashVO vo = vos[j];
+			int periodLoc = UtilPeriod.getPeriodDifference(periodBegin, vo.getIntegerValue("PERIOD"));
+			mtdValue = vo.getDoubleValue("VALUE");
+			mtdRowData.pubFun4setPeriodDataValue(periodLoc,mtdValue );
+			mtdRowData.pubFun4setPeriodDataValueBak(periodLoc, mtdValue);
+		}
+		rstList.add(mtdRowData);
+		
+		//计算当月到货的下架期数据
+		BBizData mtdOffBizData = new BBizData();
+		mtdOffBizData.setName("当月PO交货下架期");
+		ABUiRowData offRowData = new ABUiRowData();
+		offRowData.setProduct( product );
+		offRowData.setBizData( mtdOffBizData );
+		offRowData.setPeriodBegin( periodBegin );
+		offRowData.setPeriodEnd( periodEnd );
+		//PO下架日=PO的交货日期 -1个月生产提前期 + 产品的寿命周期 (Shelf Life) – 3个月(下架提前期)。
+		int shelfLife = product.getShelfLife();
+		int offLt = product.getWithdrawLeadTime();
+		int periodOffset = shelfLife-offLt+1;
+		offRowData.pubFun4setPeriodDataValue(periodOffset, mtdValue);
+		offRowData.pubFun4setPeriodDataValueBak(periodOffset, mtdValue);
+		
+		rstList.add(offRowData);
+		
+		return rstList;
+	}
+	
+	/** 查询某一产品在当期的库存总量,非下架期的 */
+	public Double getCurPeriodStockQuantityValid(BProduct product,int period) throws Exception
+	{
+		Double curPeriodStock = 0d;
+		//数据查询
+		String sql = "SELECT SUM(QUANTITY) VALUE FROM INV_STOCK_DATA WHERE PRODUCTID=? AND PERIOD=?  AND OFFSHELF_PERIOD>=? ";
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),period,period);
+		if (vos.length > 0) {
+			curPeriodStock =  vos[0].getDoubleValue("VALUE");
+		}
+		
+		if(curPeriodStock == null){
+			curPeriodStock = 0d;
+		}
+		
+		return curPeriodStock;
+	}
+	
+	/**
+	 * 查询应该已下架的库存数量
+	 * @param product
+	 * @param period
+	 * @return
+	 * @throws Exception
+	 */
+	public Double getCurPeriodStockQuantityOffShelf(BProduct product,int period) throws Exception
+	{
+		Double curPeriodStock = 0d;
+		//数据查询
+		String sql = "SELECT SUM(QUANTITY) VALUE FROM INV_STOCK_DATA WHERE PRODUCTID=? AND PERIOD=?  AND OFFSHELF_PERIOD<? ";
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),period,period);
+		if (vos.length > 0) {
+			curPeriodStock =  vos[0].getDoubleValue("VALUE");
+		}
+		
+		if(curPeriodStock == null){
+			curPeriodStock = 0d;
+		}
+		
+		return curPeriodStock;
+	}
+	
+	/**
+	 * 查询指定期间的过期在库库存
+	 */
+	public Double getCurStockOffShelf(BProduct product,int curPeriod,int offPeriod) throws Exception
+	{
+		Double curPeriodStock = 0d;
+		//数据查询
+		String sql = "SELECT SUM(QUANTITY) VALUE FROM INV_STOCK_DATA WHERE PRODUCTID=? AND PERIOD=?  AND OFFSHELF_PERIOD=? ";
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),curPeriod,offPeriod);
+		if (vos.length > 0) {
+			curPeriodStock =  vos[0].getDoubleValue("VALUE");
+		}
+		
+		if(curPeriodStock == null){
+			curPeriodStock = 0d;
+		}
+		
+		return curPeriodStock;
+	}
+	
+	/** 查询期间内的PO预计到货量
+	 */
+	public Double getPeriodTotalPO(int dataPeriod,BProduct product,int periodBegin, int periodEnd) throws Exception
+	{
+		Double totalPo = 0d;
+		String sql = "select sum(QUANTITY) VALUE from popr_data where productid=? and receiving_period >=? and receiving_period <=? and period=? and ORDERTYPE='PO'";
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),periodBegin, periodEnd,dataPeriod);
+		if (vos.length > 0) {
+			totalPo =  vos[0].getDoubleValue("VALUE");
+		}
+		
+		return totalPo;
+		
+	}
+	
+	/** 查询产品在当期的标准价格 */
+	public Double getProductStdPrice(BProduct product,int period,boolean isAcutalPrice) throws Exception
+	{
+		Double price = 0d;
+		//数据查询
+		String sql = " select TOP 1 STANDARDPRICE,REALPRICE from PRICEDATA t where t.PRODUCTID=? and t.period=? ";
+		HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql, product.getId(),period);
+		if (vos.length > 0) {
+			if(isAcutalPrice){ //使用实际价格
+				price =  vos[0].getDoubleValue("REALPRICE");
+			}else{
+				price =  vos[0].getDoubleValue("STANDARDPRICE");
+			}
+		}
+		
+		return price;
+		
+	}
+	
+	public List<BProduct> getAllDetailProducts() throws Exception {
+        List<BProduct> proList = null;
+    	
+        String sql = "select ID,CODE,NAME,ISCATALOG,IS_SUIT,SHELF_LIFE,WITHDRAW_LEAD_TIME,PURCHASE_LEAD_TIME from product where iscatalog = 0 and isvalid=1 ";
+
+    	HashVO[] vos = dmo.getHashVoArrayByDS(DMOConst.DS_DEFAULT, sql);
+        proList = new ArrayList<BProduct>(vos.length);
+        for(HashVO vo : vos){
+        	BProduct product = new BProduct();
+            product.setId(vo.getLognValue("ID"));
+            product.setName(vo.getStringValue("NAME"));
+            product.setCode(vo.getStringValue("CODE"));
+            product.setIsCatalog(vo.getIntegerValue("ISCATALOG"));
+            product.setIsSuit(vo.getIntegerValue("IS_SUIT"));
+            product.setShelfLife(vo.getIntegerValue("SHELF_LIFE"));
+            product.setWithdrawLeadTime(vo.getIntegerValue("WITHDRAW_LEAD_TIME"));
+            product.setPurchaseLeadTime(vo.getIntegerValue("PURCHASE_LEAD_TIME"));
+            
+            proList.add(product);
+        }
+
+        return proList;
+    }
+
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<joined-subclass 
+    name="dmdd.dmddjava.dataaccess.dataobject.ForecastModelMAAnalog" 
+    table="FORECASTMODELMAANALOG"
+    extends="dmdd.dmddjava.dataaccess.dataobject.ForecastModelM"
+>
+
+    <key column="ID"/>
+
+    <property
+        name="offsetPeriodNum"
+        type="int"
+        column="OFFSETPERIODNUM"
+        not-null="true"
+        length="4"
+    />
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to ForecastModelMAAnalogItem -->
+    <set
+        name="forecastModelMAAnalogItems"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="FORECASTMODELMAANALOGID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.ForecastModelMAAnalogItem"
+        />
+    </set>
+
+</joined-subclass>
+</hibernate-mapping>

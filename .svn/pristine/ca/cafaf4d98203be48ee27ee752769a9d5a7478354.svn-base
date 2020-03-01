@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.HistoryAdjustLogProOrg" 
+    table="HISTORYADJUSTLOG_PROORG"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+        unsaved-value="0"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+
+    <!-- Associations -->
+  
+    <!-- bi-directional many-to-one association to HistoryAdjustLog -->
+    <many-to-one
+        name="historyAdjustLog"
+        class="dmdd.dmddjava.dataaccess.dataobject.HistoryAdjustLog"
+        not-null="true"
+    >
+        <column name="HISTORYADJUSTLOGID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to Organization -->
+    <many-to-one
+        name="organization"
+        class="dmdd.dmddjava.dataaccess.dataobject.Organization"
+    >
+        <column name="ORGANIZATIONID" />
+    </many-to-one>
+    <!-- uni-directional many-to-one association to Product -->
+    <many-to-one
+        name="product"
+        class="dmdd.dmddjava.dataaccess.dataobject.Product"
+    >
+        <column name="PRODUCTID" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

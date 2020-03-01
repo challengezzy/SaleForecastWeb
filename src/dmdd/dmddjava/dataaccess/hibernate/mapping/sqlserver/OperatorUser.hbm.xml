@@ -1,0 +1,232 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="dmdd.dmddjava.dataaccess.dataobject.OperatorUser" 
+    table="OPERATORUSER"
+>
+    <meta attribute="implement-equals" inherit="false">true</meta>
+
+    <id
+        name="id"
+        type="java.lang.Long"
+        column="ID"
+        unsaved-value="0"
+    >
+        <meta attribute="use-in-equals">true</meta>
+        <generator class="identity" />
+    </id>
+
+    <version
+        name="version"
+        type="long"
+        column="VERSION"
+    />
+
+    <property
+        name="loginName"
+        type="java.lang.String"
+        column="LOGINNAME"
+        not-null="true"
+        unique="true"
+        length="30"
+    />
+    <property
+        name="password"
+        type="java.lang.String"
+        column="PASSWORD"
+        not-null="true"
+        length="64"
+    />
+    <property
+        name="userName"
+        type="java.lang.String"
+        column="USERNAME"
+        not-null="true"
+        unique="true"
+        length="30"
+    />
+    <property
+        name="creatorName"
+        type="java.lang.String"
+        column="CREATORNAME"
+        not-null="true"
+        length="30"
+    />
+    <property
+        name="createdTime"
+        type="java.sql.Timestamp"
+        column="CREATEDTIME"
+        not-null="true"
+        length="10"
+    />
+    <property
+        name="userExpiryTime"
+        type="java.sql.Timestamp"
+        column="USEREXPIRYTIME"
+        not-null="true"
+        length="10"
+    />
+    <property
+        name="pwdExpiryTime"
+        type="java.sql.Timestamp"
+        column="PWDEXPIRYTIME"
+        not-null="true"
+        length="10"
+    />
+    <property
+        name="isValid"
+        type="int"
+        column="ISVALID"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="position"
+        type="java.lang.String"
+        column="POSITION"
+        length="255"
+    />
+    <property
+        name="officeAddress"
+        type="java.lang.String"
+        column="OFFICEADDRESS"
+        length="255"
+    />
+    <property
+        name="homeAddress"
+        type="java.lang.String"
+        column="HOMEADDRESS"
+        length="255"
+    />
+    <property
+        name="telNo"
+        type="java.lang.String"
+        column="TELNO"
+        length="255"
+    />
+    <property
+        name="mobileNo"
+        type="java.lang.String"
+        column="MOBILENO"
+        length="255"
+    />
+    <property
+        name="email"
+        type="java.lang.String"
+        column="EMAIL"
+        length="255"
+    />
+    <property
+        name="isOnline"
+        type="int"
+        column="ISONLINE"
+        not-null="true"
+        length="2"
+    />
+    <property
+        name="loginTime"
+        type="java.sql.Timestamp"
+        column="LOGINTIME"
+        length="10"
+    />
+    <property
+        name="logoutTime"
+        type="java.sql.Timestamp"
+        column="LOGOUTTIME"
+        length="10"
+    />
+    <property
+        name="loginTimes"
+        type="long"
+        column="LOGINTIMES"
+        not-null="true"
+        length="10"
+    />
+    <property
+        name="comments"
+        type="java.lang.String"
+        column="COMMENTS"
+        length="255"
+    />
+
+    <!-- Associations -->
+  
+    <!-- bi-directional one-to-many association to OperatorUserBizData -->
+    <set
+        name="operatorUserBizDatas"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="OPERATORUSERID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.OperatorUserBizData"
+        />
+    </set>
+
+    <!-- bi-directional one-to-many association to OperatorUserFunPermission -->
+    <set
+        name="operatorUserFunPermissions"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="OPERATORUSERID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.OperatorUserFunPermission"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to OperatorUserProOrg -->
+    <set
+        name="operatorUserProOrgs"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="OPERATORUSERID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.OperatorUserProOrg"
+        />
+    </set>
+    <!-- bi-directional one-to-many association to OperatorUser -->
+    <set
+        name="subOperatorUsers"
+        lazy="true"
+        inverse="true"
+		cascade="none"
+    >
+        <key>
+            <column name="SUPERIORUSERID" />
+        </key>
+        <one-to-many 
+            class="dmdd.dmddjava.dataaccess.dataobject.OperatorUser"
+        />
+    </set>
+    <!-- bi-directional many-to-one association to OperatorUser -->
+    <many-to-one
+        name="superiorOperatorUser"
+        class="dmdd.dmddjava.dataaccess.dataobject.OperatorUser"
+        not-null="true"
+    >
+        <column name="SUPERIORUSERID" />
+    </many-to-one>
+
+</class>
+</hibernate-mapping>

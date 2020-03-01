@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<joined-subclass 
+    name="dmdd.dmddjava.dataaccess.dataobject.BizDataDefItemFcComb" 
+    table="BIZDATADEFITEMFCCOMB"
+    extends="dmdd.dmddjava.dataaccess.dataobject.BizDataDefItem"
+>
+
+
+    <key column="ID"/>
+
+    <property
+        name="coefficient"
+        type="java.lang.Double"
+        column="COEFFICIENT"
+        not-null="true"
+        length="18"
+    />
+
+    <!-- Associations -->
+  
+    <!-- uni-directional many-to-one association to BizData -->
+    <many-to-one
+        name="itemBizData"
+        class="dmdd.dmddjava.dataaccess.dataobject.BizData"
+    >
+        <column name="ITEMBIZDATAID" />
+    </many-to-one>
+
+</joined-subclass>
+</hibernate-mapping>
